@@ -19,6 +19,12 @@ if exist %AGY_NODE% (
     goto end
 )
 
+set CC_NODE="C:\Program Files\Common Files\Adobe\Creative Cloud Libraries\libs\node.exe"
+if exist %CC_NODE% (
+    %CC_NODE% serve.js --open
+    goto end
+)
+
 echo No se detecto Node.js directamente. Iniciando servidor liviano con PowerShell...
 powershell -NoProfile -ExecutionPolicy Bypass -Command "$port = 3000; Start-Process 'http://localhost:3000'; & 'serve.js'"
 
