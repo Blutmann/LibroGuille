@@ -1,0 +1,987 @@
+/* ==========================================================================
+   ESTILOS DEL LIBRO FÍSICO — "LIBRO PARA MIS HIJOS" (ITERACIÓN 4)
+   Apertura física variable (0° a 180°), perspectiva humana y flexión natural de papel
+   ========================================================================== */
+
+/* Contenedor del libro apoyado sobre el escritorio de roble */
+.book-container {
+  position: relative;
+  width: var(--book-width);
+  height: var(--book-height);
+  perspective: 1600px;
+  transform-style: preserve-3d;
+  user-select: none;
+  
+  /* Sombra de contacto volumétrica y ambient occlusion proyectada sobre la madera de roble */
+  filter: drop-shadow(0px 20px 25px rgba(0, 0, 0, 0.85)) drop-shadow(25px 40px 50px rgba(10, 6, 4, 0.75));
+  transition: transform 0.35s cubic-bezier(0.2, 0.85, 0.35, 1);
+}
+
+/* Base de encuadernación que abraza el libro (Tela azul y esquinas de cuero tostado) */
+.book-cover-backing {
+  position: absolute;
+  inset: -8px -12px -10px -12px;
+  background-color: var(--cover-navy-dark);
+  background-image: 
+    linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 40%),
+    url('../assets/textures/moda-book-back-cover.webp');
+  background-size: cover;
+  background-position: center center;
+  border-radius: 8px;
+  border: 1px solid rgba(138, 101, 64, 0.4);
+  box-shadow: 
+    inset 1px 1px 2px rgba(255, 230, 180, 0.25),
+    inset -2px -2px 4px rgba(0, 0, 0, 0.7),
+    0 4px 15px rgba(0, 0, 0, 0.85);
+  z-index: 1;
+  transition: none;
+}
+
+/* Base adaptada dinámicamente según ángulo de apertura */
+.book-cover-backing {
+  left: var(--backing-left, calc(50% - 14px));
+  width: var(--backing-width, calc(50% + 22px));
+}
+
+.book-cover-backing::after {
+  content: "";
+  position: absolute;
+  inset: 5px 6px;
+  border: 1px dashed rgba(201, 158, 88, 0.25);
+  border-radius: 6px;
+  pointer-events: none;
+}
+
+/* Bloque del libro (cuerpo transparente que alberga las alas izquierda y derecha) */
+.book-body {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  background: transparent;
+  border-radius: 4px;
+  z-index: 5;
+  transform-style: preserve-3d;
+}
+
+/* En portada/guarda o cerrado: la página izquierda base no debe asomar porque la tapa frontal es la superficie izquierda */
+.book-container.is-cover-view .page-left,
+.book-container.is-closed .page-left {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+}
+
+/* Lomo redondeado de encuadernación artesanal para libro cerrado (en el eje central del tomo) */
+.book-closed-spine {
+  position: absolute;
+  left: 50%;
+  top: -8px;
+  bottom: -10px;
+  width: 32px;
+  transform: translateX(-50%);
+  background-color: var(--cover-navy-dark);
+  background-image: 
+    linear-gradient(
+      to right,
+      #090e17 0%,
+      rgba(24, 35, 53, 0.7) 35%,
+      rgba(35, 50, 75, 0.7) 65%,
+      #0c121d 100%
+    ),
+    url('../assets/textures/moda-book-front-cover.webp');
+  background-size: cover;
+  background-position: left center;
+  border-radius: 8px 0 0 8px;
+  border-left: 2px solid var(--leather-tan);
+  box-shadow: 
+    inset 0 0 8px rgba(0,0,0,0.85),
+    -4px 2px 8px rgba(0,0,0,0.65);
+  z-index: 65;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+/* Nervios en relieve y filetes dorados del lomo */
+.book-closed-spine::before {
+  content: "";
+  position: absolute;
+  top: 15%;
+  bottom: 15%;
+  left: 2px;
+  right: 2px;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 45px,
+    rgba(201, 158, 88, 0.45) 45px,
+    rgba(201, 158, 88, 0.45) 47px,
+    rgba(0, 0, 0, 0.6) 47px,
+    rgba(0, 0, 0, 0.6) 50px
+  );
+}
+
+/* Tapa dura frontal interactiva con apertura variable (0° a 180°) */
+.book-front-cover {
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  width: calc(50% + 8px);
+  height: calc(100% + 12px);
+  transform-style: preserve-3d;
+  transform-origin: left center;
+  z-index: 70;
+  cursor: grab;
+  touch-action: none;
+  transform: rotateY(calc(-1deg * var(--cover-angle, 0)));
+}
+
+.book-front-cover.is-dragging {
+  cursor: grabbing;
+  transition: none !important;
+}
+
+.book-front-cover.is-settling {
+  transition: transform 0.45s cubic-bezier(0.2, 0.85, 0.35, 1);
+}
+
+.cover-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: 4px 8px 8px 4px;
+  overflow: hidden;
+}
+
+.cover-face.front-face {
+  z-index: 2;
+  box-shadow: 
+    inset 0 0 45px rgba(0, 0, 0, 0.75),
+    inset 1px 1px 2px rgba(255, 230, 180, 0.25),
+    3px 4px 12px rgba(0, 0, 0, 0.55);
+}
+
+.cover-face.back-face {
+  transform: rotateY(180deg);
+  background-color: var(--paper-ivory);
+  background-image: 
+    linear-gradient(to right, rgba(0,0,0,0.03) 0%, transparent 10%, rgba(20,12,6,0.08) 88%, rgba(20,12,6,0.32) 100%),
+    url('../assets/textures/moda-page-gutter-paper.webp');
+  background-size: cover;
+  border-radius: 8px 4px 4px 8px;
+  box-shadow: 
+    inset 1px 0 2px rgba(255, 255, 255, 0.6),
+    inset -15px 0 25px rgba(20, 12, 6, 0.15);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 34px 42px;
+  overflow: hidden;
+}
+
+/* Hendidura y canal central del lomo cuando el libro está abierto */
+.book-spine-crease {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 44px;
+  transform: translateX(-50%);
+  background: linear-gradient(
+    to right,
+    rgba(12, 8, 5, 0.55) 0%,
+    rgba(15, 10, 6, 0.28) 25%,
+    rgba(255, 250, 240, 0.22) 48%,
+    rgba(12, 8, 5, 0.65) 50%,
+    rgba(255, 250, 240, 0.22) 52%,
+    rgba(15, 10, 6, 0.28) 75%,
+    rgba(12, 8, 5, 0.55) 100%
+  );
+  z-index: 40;
+  pointer-events: none;
+  box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.55);
+}
+
+.book-container.is-closed .book-spine-crease {
+  display: none;
+}
+
+/* ==========================================================================
+   PÁGINAS ESTÁTICAS Y CURVATURA DE PAPEL CON TEXTURA ARCHIVÍSTICA
+   ========================================================================== */
+
+.book-page {
+  position: relative;
+  width: 50%;
+  height: 100%;
+  padding: 34px 42px;
+  background-color: var(--paper-ivory);
+  background-image: url('../assets/textures/moda-page-gutter-paper.webp');
+  background-size: cover;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+  transform-style: preserve-3d;
+}
+
+.book-page.page-left {
+  border-radius: 4px 0 0 4px;
+  background-image: 
+    linear-gradient(to right, rgba(0,0,0,0.03) 0%, transparent 10%, rgba(20,12,6,0.08) 88%, rgba(20,12,6,0.32) 100%),
+    url('../assets/textures/moda-page-gutter-paper.webp');
+  background-size: cover;
+  box-shadow: 
+    var(--left-edge-shadow, -2px 0 0 #eae2d0, -5px 1px 0 #ded4be, 0 3px 0 #ded4be, 0 6px 12px rgba(0,0,0,0.35)),
+    inset 1px 0 2px rgba(255, 255, 255, 0.6);
+  transition: box-shadow 0.4s ease, opacity 0.3s ease;
+}
+
+.book-page.page-right {
+  border-radius: 0 4px 4px 0;
+  background-image: 
+    linear-gradient(to left, rgba(0,0,0,0.03) 0%, transparent 10%, rgba(20,12,6,0.08) 88%, rgba(20,12,6,0.32) 100%),
+    url('../assets/textures/moda-page-gutter-paper.webp');
+  background-size: cover;
+  box-shadow: 
+    var(--right-edge-shadow, 2px 0 0 #eae2d0, 5px 1px 0 #ded4be, 8px 2px 0 #cfc3a9, 12px 3px 0 #bdae92, 16px 4px 0 #a39376, 0 3px 0 #ded4be, 0 6px 0 #cfc3a9, 0 10px 0 #baa98c, 0 16px 24px rgba(0, 0, 0, 0.65)),
+    inset -1px 0 2px rgba(255, 255, 255, 0.6);
+  transition: box-shadow 0.4s ease;
+}
+
+/* Portada encuadernada auténtica de MODA AI (Tela azul marino, esquinas de cuero y etiqueta histórica manuscrita) */
+.book-cover-view {
+  width: 100%;
+  height: 100%;
+  background-color: var(--cover-navy);
+  background-image: 
+    radial-gradient(ellipse 90% 80% at 35% 30%, rgba(255,255,255,0.12) 0%, transparent 60%),
+    linear-gradient(135deg, rgba(14, 20, 32, 0.35) 0%, rgba(22, 32, 50, 0.1) 45%, rgba(9, 13, 22, 0.65) 100%),
+    url('../assets/textures/moda-book-front-cover.webp');
+  background-size: cover;
+  background-position: center center;
+  color: #eeddbb;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  border-radius: 4px 8px 8px 4px;
+  padding: 30px;
+  text-align: center;
+  position: relative;
+  box-shadow: 
+    inset 0 0 45px rgba(0, 0, 0, 0.8),
+    inset 2px 2px 4px rgba(255, 230, 180, 0.25);
+}
+
+/* Indicación sutil para abrir el libro cerrado */
+.cover-open-affordance {
+  margin-top: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(201, 158, 88, 0.18);
+  border: 1px dashed rgba(201, 158, 88, 0.55);
+  padding: 5px 14px;
+  border-radius: 20px;
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  color: var(--gold-foil-light);
+  animation: pulseAffordance 3s infinite ease-in-out;
+}
+
+@keyframes pulseAffordance {
+  0%, 100% { opacity: 0.8; transform: translateY(0); }
+  50% { opacity: 1; transform: translateY(-2px); }
+}
+
+.cover-gold-border {
+  position: absolute;
+  inset: 22px;
+  border: 2px solid #c99e58;
+  border-radius: 6px;
+  pointer-events: none;
+  box-shadow: 
+    inset 0 1px 1px rgba(0, 0, 0, 0.7),
+    0 1px 1px rgba(255, 240, 200, 0.25);
+}
+
+.cover-gold-border::before {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border: 1px solid rgba(201, 158, 88, 0.5);
+  border-radius: 4px;
+}
+
+.cover-title {
+  font-family: var(--font-display);
+  font-size: 2.15rem;
+  letter-spacing: 0.08em;
+  color: #ecd59b;
+  text-shadow: 
+    0 -1px 0 rgba(0, 0, 0, 0.85),
+    0 1px 1px rgba(255, 240, 200, 0.35),
+    1px 2px 4px rgba(0, 0, 0, 0.95);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.cover-rule {
+  width: 130px;
+  height: 2px;
+  background: linear-gradient(to right, transparent, var(--gold-foil), transparent);
+  margin: 16px 0;
+}
+
+.cover-author {
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-style: italic;
+  color: #dfceb1;
+  letter-spacing: 0.05em;
+  margin-bottom: 20px;
+}
+
+.cover-ornament {
+  font-size: 1.7rem;
+  color: var(--gold-foil);
+  margin-bottom: 18px;
+}
+
+.cover-dates {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.15em;
+  color: #baa88f;
+}
+
+/* ==========================================================================
+   ZONAS INTERACTIVAS DE AGARRE DE HOJAS
+   ========================================================================== */
+
+.page-turn-trigger {
+  position: absolute;
+  width: 90px;
+  height: 90px;
+  z-index: 45;
+  cursor: grab;
+  pointer-events: auto;
+  touch-action: none;
+}
+
+.page-turn-trigger:active {
+  cursor: grabbing;
+}
+
+.page-turn-trigger.corner-top-right {
+  top: 0;
+  right: 0;
+  clip-path: polygon(100% 0, 0 0, 100% 100%);
+}
+
+.page-turn-trigger.corner-bottom-right {
+  bottom: 0;
+  right: 0;
+  clip-path: polygon(100% 0, 0 100%, 100% 100%);
+}
+
+.page-turn-trigger.corner-top-left {
+  top: 0;
+  left: 0;
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+}
+
+.page-turn-trigger.corner-bottom-left {
+  bottom: 0;
+  left: 0;
+  clip-path: polygon(0 0, 0 100%, 100% 100%);
+}
+
+.corner-peel-hint {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  pointer-events: none;
+}
+
+.page-turn-trigger.corner-bottom-right:hover .corner-peel-hint,
+.page-turn-trigger.corner-top-right:hover .corner-peel-hint {
+  opacity: 1;
+  background: linear-gradient(135deg, transparent 55%, rgba(0, 0, 0, 0.15) 58%, #f0e6ce 60%, #fff 90%);
+  filter: drop-shadow(-3px -3px 4px rgba(0, 0, 0, 0.25));
+  transform: translate(-4px, -4px);
+}
+
+.page-turn-trigger.corner-bottom-left:hover .corner-peel-hint,
+.page-turn-trigger.corner-top-left:hover .corner-peel-hint {
+  opacity: 1;
+  background: linear-gradient(-135deg, transparent 55%, rgba(0, 0, 0, 0.15) 58%, #f0e6ce 60%, #fff 90%);
+  filter: drop-shadow(3px -3px 4px rgba(0, 0, 0, 0.25));
+  transform: translate(4px, -4px);
+}
+
+/* Franja perimetral de agarre de la hoja */
+.page-edge-strip {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 55px;
+  z-index: 42;
+  cursor: grab;
+  touch-action: none;
+}
+
+.page-edge-strip:active {
+  cursor: grabbing;
+}
+
+.page-edge-strip.edge-right {
+  right: 0;
+}
+
+.page-edge-strip.edge-left {
+  left: 0;
+}
+
+/* ==========================================================================
+   HOJA MÓVIL Y ARRASTRE PROGRESIVO EN TIEMPO REAL
+   ========================================================================== */
+
+.flipping-leaf {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 50%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transform-origin: left center;
+  z-index: 60;
+  pointer-events: none;
+  
+  /* Giro tridimensional puro sin distorsión de skew para evitar pliegues artificiales */
+  transform: 
+    rotateY(var(--leaf-angle, 0deg)) 
+    translateZ(var(--leaf-z, 0px));
+}
+
+.flipping-leaf.flip-left-to-right {
+  left: 0;
+  right: auto;
+  transform-origin: right center;
+}
+
+/* Movimiento 1:1 en tiempo real al arrastrar con el mouse */
+.flipping-leaf.is-dragging-leaf {
+  transition: none !important;
+}
+
+/* Continuidad suave con cadencia física pausada (650-900ms) */
+.flipping-leaf.is-finishing-turn {
+  transition: transform 0.75s cubic-bezier(0.25, 0.9, 0.35, 1);
+}
+
+.leaf-face {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  padding: 34px 42px;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  background-color: var(--paper-ivory);
+  background-image: url('../assets/textures/moda-page-gutter-paper.webp');
+  background-size: cover;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.leaf-face.front {
+  z-index: 2;
+  border-radius: 0 4px 4px 0;
+  background-image: 
+    linear-gradient(to left, rgba(0,0,0,0.03) 0%, transparent 12%, rgba(20,12,6,0.08) 85%, rgba(20,12,6,0.3) 100%),
+    url('../assets/textures/moda-page-gutter-paper.webp');
+  background-size: cover;
+  box-shadow: -4px 0 18px rgba(0, 0, 0, 0.28);
+}
+
+.leaf-face.back {
+  transform: rotateY(180deg);
+  border-radius: 4px 0 0 4px;
+  background-image: 
+    linear-gradient(to right, rgba(0,0,0,0.03) 0%, transparent 12%, rgba(20,12,6,0.08) 85%, rgba(20,12,6,0.3) 100%),
+    url('../assets/textures/moda-page-gutter-paper.webp');
+  background-size: cover;
+  box-shadow: 4px 0 18px rgba(0, 0, 0, 0.28);
+}
+
+.flipping-leaf.flip-left-to-right .leaf-face.front {
+  border-radius: 4px 0 0 4px;
+  background-image: 
+    linear-gradient(to right, rgba(0,0,0,0.03) 0%, transparent 12%, rgba(20,12,6,0.08) 85%, rgba(20,12,6,0.3) 100%),
+    url('../assets/textures/moda-page-gutter-paper.webp');
+  background-size: cover;
+  box-shadow: 4px 0 18px rgba(0, 0, 0, 0.28);
+}
+
+.flipping-leaf.flip-left-to-right .leaf-face.back {
+  border-radius: 0 4px 4px 0;
+  background-image: 
+    linear-gradient(to left, rgba(0,0,0,0.03) 0%, transparent 12%, rgba(20,12,6,0.08) 85%, rgba(20,12,6,0.3) 100%),
+    url('../assets/textures/moda-page-gutter-paper.webp');
+  background-size: cover;
+  box-shadow: -4px 0 18px rgba(0, 0, 0, 0.28);
+}
+
+/* Sombra dinámica de flexión de papel y curvatura cilíndrica con reflejo satinado suave (sin resplandor blanco) */
+.leaf-shadow-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    to right,
+    rgba(20, 12, 6, 0.35) 0%,
+    rgba(255, 245, 220, 0.12) calc(var(--leaf-crest, 50%) - 14%),
+    rgba(255, 250, 235, 0.25) var(--leaf-crest, 50%),
+    rgba(20, 12, 6, 0.25) calc(var(--leaf-crest, 50%) + 18%),
+    transparent 100%
+  );
+  opacity: var(--leaf-shadow-opacity, 0);
+  transition: opacity 0.08s ease;
+}
+
+/* Sombra proyectada por la hoja sobre el pliego inferior */
+.page-cast-shadow {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50%;
+  pointer-events: none;
+  z-index: 55;
+  background: radial-gradient(ellipse at 50% 50%, rgba(0, 0, 0, 0.5) 0%, transparent 75%);
+  opacity: var(--cast-shadow-opacity, 0);
+  transition: opacity 0.1s ease;
+}
+
+/* ==========================================================================
+   TIPOGRAFÍA Y CONTENIDO EDITORIAL DE PÁGINAS
+   ========================================================================== */
+
+.page-content-wrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+}
+
+.page-header-row,
+.page-header-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.72rem;
+  color: var(--ink-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(140, 128, 113, 0.22);
+  margin-bottom: 10px;
+  flex-shrink: 0;
+}
+
+.page-fictional-tag {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: #9c3b35;
+  background: rgba(168, 66, 59, 0.07);
+  border: 1px dashed rgba(168, 66, 59, 0.3);
+  padding: 1px 6px;
+  border-radius: 2px;
+}
+
+.page-body-scrollable {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  overflow: hidden;
+}
+
+.page-footer-row,
+.page-footer-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.78rem;
+  color: var(--ink-secondary);
+  padding-top: 8px;
+  border-top: 1px solid rgba(140, 128, 113, 0.18);
+  margin-top: 8px;
+  flex-shrink: 0;
+}
+
+.page-footer-author {
+  font-family: var(--font-serif);
+  font-size: 0.76rem;
+  color: var(--ink-secondary);
+}
+
+.page-footer-num {
+  font-family: var(--font-serif);
+  font-weight: bold;
+  font-size: 0.8rem;
+  color: var(--ink-primary);
+}
+
+.page-number {
+  font-family: var(--font-serif);
+  font-weight: bold;
+}
+
+.page-content-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.page-heading {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  color: var(--ink-highlight);
+  margin-bottom: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.editorial-text {
+  font-size: 0.96rem;
+  line-height: 1.7;
+  color: var(--ink-primary);
+  text-align: justify;
+}
+
+.editorial-text p {
+  margin-bottom: 12px;
+  text-indent: 1.4em;
+}
+
+.dropcap-paragraph {
+  text-indent: 0 !important;
+}
+
+.dropcap {
+  float: left;
+  font-family: var(--font-display);
+  font-size: 3.3rem;
+  line-height: 0.82;
+  padding-top: 4px;
+  padding-right: 10px;
+  padding-bottom: 2px;
+  color: var(--ink-highlight);
+  font-weight: bold;
+}
+
+.handwriting-signature {
+  margin-top: 22px;
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.sig-name {
+  font-family: "Brush Script MT", "Snell Roundhand", "Baskerville", cursive, serif;
+  font-size: 1.55rem;
+  color: #3b2a1a;
+  transform: rotate(-3deg);
+  display: inline-block;
+}
+
+.sig-date {
+  font-size: 0.75rem;
+  color: var(--ink-muted);
+  font-style: italic;
+  margin-top: 4px;
+}
+
+.ex-libris-box {
+  border: 2px solid #5a4b3c;
+  padding: 22px 18px;
+  text-align: center;
+  background: rgba(235, 222, 198, 0.4);
+  border-radius: 4px;
+  margin-bottom: 22px;
+  position: relative;
+}
+
+.ex-libris-header {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  letter-spacing: 0.25em;
+  color: #5a4b3c;
+  font-weight: bold;
+}
+
+.ex-libris-name {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  color: var(--ink-highlight);
+  margin: 8px 0;
+}
+
+.ex-libris-note {
+  font-size: 0.85rem;
+  font-style: italic;
+  color: var(--ink-secondary);
+}
+
+.archival-note {
+  background: #ede3ce;
+  border-left: 3px solid var(--gold-foil);
+  padding: 9px 12px;
+  font-size: 0.78rem;
+  color: var(--ink-secondary);
+  line-height: 1.5;
+}
+
+.ornament-divider {
+  color: var(--gold-foil);
+  font-size: 1.2rem;
+  margin: 6px 0;
+}
+
+.title-page-content {
+  text-align: center;
+  padding: 8px;
+}
+
+.title-page-content .main-title {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  color: var(--ink-primary);
+  margin: 14px 0;
+  letter-spacing: 0.05em;
+}
+
+.title-page-content .author-label {
+  font-style: italic;
+  font-size: 0.92rem;
+  color: var(--ink-muted);
+}
+
+.title-page-content .author-name {
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  color: var(--ink-highlight);
+  margin: 8px 0;
+}
+
+.title-page-content .location-date {
+  font-size: 0.82rem;
+  color: var(--ink-muted);
+  margin-top: 16px;
+}
+
+.rule-line {
+  width: 60px;
+  height: 1px;
+  background: #a69882;
+  margin: 12px auto;
+}
+
+.photo-album-mount {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.photo-frame-classic {
+  position: relative;
+  background: #3e3226;
+  padding: 8px;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.3), 0 2px 5px rgba(0, 0, 0, 0.2);
+  border-radius: 2px;
+  max-width: 88%;
+}
+
+.photo-corner {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  background: #2a221a;
+  border: 1px solid #75624e;
+  z-index: 10;
+}
+
+.photo-corner.top-left { top: -3px; left: -3px; clip-path: polygon(0 0, 100% 0, 0 100%); }
+.photo-corner.top-right { top: -3px; right: -3px; clip-path: polygon(0 0, 100% 0, 100% 100%); }
+.photo-corner.bottom-left { bottom: -3px; left: -3px; clip-path: polygon(0 0, 0 100%, 100% 100%); }
+.photo-corner.bottom-right { bottom: -3px; right: -3px; clip-path: polygon(100% 0, 100% 100%, 0 100%); }
+
+.photo-frame-classic img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border: 1px solid #705b45;
+}
+
+.photo-caption-block {
+  margin-top: 12px;
+  text-align: center;
+  max-width: 85%;
+}
+
+.photo-caption-text {
+  font-size: 0.85rem;
+  font-style: italic;
+  color: var(--ink-secondary);
+  line-height: 1.45;
+}
+
+.photo-archival-tag {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--ink-muted);
+  margin-top: 5px;
+  letter-spacing: 0.05em;
+}
+
+.future-clipping-card {
+  margin-top: 16px;
+  border: 2px dashed #998369;
+  background: #f1ebd8;
+  padding: 14px;
+  border-radius: 4px;
+  box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.06);
+}
+
+.clipping-tag {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--ink-highlight);
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+.clipping-preview-text {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 0.92rem;
+  color: var(--ink-primary);
+  margin-bottom: 6px !important;
+  text-indent: 0 !important;
+}
+
+.clipping-subtext {
+  font-size: 0.76rem;
+  color: var(--ink-muted);
+  display: block;
+  line-height: 1.4;
+}
+
+.colophon {
+  text-align: center;
+  padding: 18px;
+  font-size: 0.85rem;
+  color: var(--ink-secondary);
+  line-height: 1.6;
+}
+
+.colophon h4 {
+  font-family: var(--font-display);
+  color: var(--ink-highlight);
+  font-size: 1.1rem;
+  margin-bottom: 10px;
+}
+
+.copyright-note {
+  font-size: 0.72rem;
+  color: var(--ink-muted);
+  margin-top: 8px;
+}
+
+/* ==========================================================================
+   ADAPTACIÓN RESPONSIVE (MÓVIL Y PANTALLAS PEQUEÑAS)
+   ========================================================================== */
+
+@media (max-width: 900px) {
+  :root {
+    --book-width: 92vw;
+    --book-height: 68vh;
+  }
+  .book-page {
+    padding: 24px 28px;
+  }
+}
+
+@media (max-width: 720px) {
+  :root {
+    --book-width: 92vw;
+    --book-height: 72vh;
+    --page-width: 100%;
+  }
+
+  .desk-surface {
+    padding: 8px 10px 12px 10px;
+  }
+
+  .book-container {
+    width: 92vw;
+  }
+
+  .book-body {
+    display: block;
+    box-shadow: 0 3px 0 var(--paper-edge), 0 6px 0 #cfc3a9, 0 10px 25px rgba(0, 0, 0, 0.6);
+  }
+
+  .book-front-cover {
+    width: 100%;
+    right: 0;
+    top: 0;
+    height: 100%;
+  }
+
+  .book-page {
+    width: 100%;
+    height: 100%;
+    border-radius: 4px;
+    padding: 20px 22px;
+  }
+
+  .book-page.page-left {
+    display: none;
+  }
+
+  .book-page.page-right {
+    display: flex;
+    background-image: radial-gradient(ellipse 90% 90% at 50% 30%, #fff 0%, var(--paper-ivory) 80%, #ebe2ce 100%);
+  }
+
+  .book-closed-spine {
+    display: none;
+  }
+
+  .book-spine-crease {
+    display: none;
+  }
+
+  .desk-interaction-hints {
+    display: none;
+  }
+
+  .btn-text-desktop {
+    display: none;
+  }
+}

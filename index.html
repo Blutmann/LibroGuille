@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Libro para mis hijos — Guillermo Bautista Harispe</title>
+  <meta name="description" content="Prototipo web interactivo de preservación y digitalización del manuscrito familiar 'Libro para mis hijos' por Guillermo Bautista Harispe.">
+  
+  <!-- Estilos del proyecto -->
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/book.css">
+  <link rel="stylesheet" href="css/typewriter.css">
+  
+  <!-- Favicon vectorial sutil -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📖</text></svg>">
+</head>
+<body>
+  <!-- Escenario ambiental: Escritorio de roble oscuro con iluminación cenital -->
+  <div class="desk-surface" id="deskSurface">
+    
+    <!-- ETAPA B: Escena de Entrada Narrativa — Estudio de Escritor de Época y Máquina de Escribir Negra -->
+    <section class="scene-typewriter" id="sceneTypewriter" aria-label="Estudio privado con máquina de escribir de época">
+      
+      <!-- Fondo arquitectónico: Boiserie de paneles de madera noble y haz de lámpara de escritorio -->
+      <div class="study-room-backdrop" aria-hidden="true">
+        <div class="study-boiserie-wall">
+          <div class="boiserie-panel"></div>
+          <div class="boiserie-panel"></div>
+          <div class="boiserie-panel"></div>
+          <div class="boiserie-panel"></div>
+        </div>
+        <div class="study-ambient-lamp-beam"></div>
+      </div>
+
+      <div class="typewriter-narrative-header">
+        <h2>El Estudio de Guillermo</h2>
+        <p>Un espacio íntimo para acercarse a sus recuerdos. Podés tipear su apellido en la máquina de época o abrir directamente su libro.</p>
+      </div>
+
+      <div class="typewriter-viewport">
+        
+        <!-- Plano del escritorio de roble oscuro con atrezzo de época en CSS puro -->
+        <div class="study-desk-plane" aria-hidden="true">
+          
+          <!-- Lado izquierdo: Libros antiguos apilados con lomos repujados en oro y hojas de manuscrito -->
+          <div class="study-prop-group left-props">
+            <div class="study-prop-manuscripts">
+              <div class="manuscript-leaf leaf-under"></div>
+              <div class="manuscript-leaf leaf-top"></div>
+            </div>
+            <div class="study-prop-books">
+              <div class="vintage-book book-stack-1">
+                <span class="book-spine-label">❖ Harispe · Memorias</span>
+              </div>
+              <div class="vintage-book book-stack-2">
+                <span class="book-spine-label">Crónicas 1930</span>
+              </div>
+              <div class="vintage-book book-stack-3">
+                <span class="book-spine-label">Documentos</span>
+              </div>
+              <div class="vintage-book book-upright">
+                <span class="book-spine-label">Registro</span>
+              </div>
+              <div class="bookend-bronze"></div>
+            </div>
+          </div>
+
+          <!-- Lado derecho: Tintero de cristal oscuro tallado y pluma estilográfica de época -->
+          <div class="study-prop-group right-props">
+            <div class="study-prop-inkwell">
+              <div class="inkwell-cap"></div>
+              <div class="inkwell-neck"></div>
+              <div class="inkwell-body"></div>
+              <div class="inkwell-shadow"></div>
+            </div>
+            <div class="study-prop-pen">
+              <div class="pen-nib"></div>
+              <div class="pen-collar"></div>
+              <div class="pen-barrel"></div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Chasis tridimensional de la máquina de escribir mecánica en esmalte negro profundo -->
+        <div class="typewriter-chassis" id="typewriterChassis">
+          
+          <!-- Barra superior con placa dorada y control de sonido Web Audio API -->
+          <div class="typewriter-top-bar">
+            <div class="typewriter-badge">Continental Standard · 1952</div>
+            <button type="button" id="btnToggleSound" class="btn-sound-toggle" aria-label="Activar o desactivar sonido mecánico" title="Sonido mecánico sintetizado">
+              <span id="soundIcon">🔊</span> <span id="soundText">Sonido ON</span>
+            </button>
+          </div>
+          
+          <!-- Carro porta-papel con riel mecánico y rodillo (Platen) -->
+          <div class="typewriter-carriage-assembly" id="carriageAssembly">
+            <div class="carriage-track-rail"></div>
+
+            <div class="typewriter-paper-sheet" id="typewriterPaperSheet" title="Hoja de papel en el rodillo (Tocá aquí para escribir)">
+              <div class="paper-watermark-text">República Argentina · Manuscrito Familiar</div>
+              <div class="paper-typed-output" id="paperTypedOutput" aria-live="polite">
+                <span class="typewriter-cursor" aria-hidden="true"></span>
+              </div>
+              <div class="paper-hint-footer">
+                <span>Clave de acceso:</span>
+                <span class="hint-target-pill">HARISPE</span>
+              </div>
+            </div>
+
+            <!-- Rodillo de goma negra con perillas laterales moleteadas -->
+            <div class="typewriter-platen-roller">
+              <div class="platen-knob knob-left"></div>
+              <div class="platen-scale-bar"></div>
+              <div class="platen-knob knob-right"></div>
+            </div>
+          </div>
+
+          <!-- Cesta de tipos mecánicos y martillo animado (Typebar Striker) -->
+          <div class="typebar-basket">
+            <div class="typebar-striker" id="typebarStriker"></div>
+            <div class="ribbon-guide-fork"></div>
+          </div>
+
+          <!-- Teclado escalonado vintage 3D -->
+          <div class="typewriter-keyboard" role="group" aria-label="Teclado mecánico de la máquina">
+            <!-- Fila 1 -->
+            <div class="keyboard-row row-1">
+              <button type="button" class="type-key" data-key="Q">Q</button>
+              <button type="button" class="type-key" data-key="W">W</button>
+              <button type="button" class="type-key" data-key="E">E</button>
+              <button type="button" class="type-key" data-key="R">R</button>
+              <button type="button" class="type-key" data-key="T">T</button>
+              <button type="button" class="type-key" data-key="Y">Y</button>
+              <button type="button" class="type-key" data-key="U">U</button>
+              <button type="button" class="type-key" data-key="I">I</button>
+              <button type="button" class="type-key" data-key="O">O</button>
+              <button type="button" class="type-key" data-key="P">P</button>
+            </div>
+            <!-- Fila 2 -->
+            <div class="keyboard-row row-2">
+              <button type="button" class="type-key" data-key="A">A</button>
+              <button type="button" class="type-key" data-key="S">S</button>
+              <button type="button" class="type-key" data-key="D">D</button>
+              <button type="button" class="type-key" data-key="F">F</button>
+              <button type="button" class="type-key" data-key="G">G</button>
+              <button type="button" class="type-key" data-key="H">H</button>
+              <button type="button" class="type-key" data-key="J">J</button>
+              <button type="button" class="type-key" data-key="K">K</button>
+              <button type="button" class="type-key" data-key="L">L</button>
+              <button type="button" class="type-key" data-key="Ñ">Ñ</button>
+            </div>
+            <!-- Fila 3 -->
+            <div class="keyboard-row row-3">
+              <button type="button" class="type-key key-action" data-key="CLEAR" id="btnClearTypewriter" title="Borrar todo">Borrar</button>
+              <button type="button" class="type-key" data-key="Z">Z</button>
+              <button type="button" class="type-key" data-key="X">X</button>
+              <button type="button" class="type-key" data-key="C">C</button>
+              <button type="button" class="type-key" data-key="V">V</button>
+              <button type="button" class="type-key" data-key="B">B</button>
+              <button type="button" class="type-key" data-key="N">N</button>
+              <button type="button" class="type-key" data-key="M">M</button>
+              <button type="button" class="type-key key-action" data-key="BACKSPACE" title="Retroceso">⌫</button>
+            </div>
+            <!-- Fila 4 -->
+            <div class="keyboard-row row-4">
+              <button type="button" class="type-key key-space" data-key="SPACE">ESPACIO</button>
+            </div>
+          </div>
+
+          <!-- Input invisible accesible para sincronización móvil -->
+          <input type="text" id="typewriterHiddenInput" class="typewriter-hidden-input" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" aria-hidden="true">
+        </div>
+      </div>
+
+      <!-- Acceso directo y accesible -->
+      <div class="typewriter-access-actions">
+        <button type="button" id="btnBypassTypewriter" class="btn-bypass-narrative" aria-label="Abrir directamente el libro de Guillermo">
+          Abrir directamente el libro de Guillermo →
+        </button>
+      </div>
+    </section>
+
+    <!-- ETAPAS A y B: Escena Principal del Libro Físico -->
+    <div class="scene-book is-hidden" id="sceneBook">
+      
+      <!-- Encabezado superior discreto y subordinado -->
+      <header class="app-header" role="banner">
+        <div class="header-title-group">
+          <h1>Libro para mis hijos</h1>
+          <div class="author-subtitle">Guillermo Bautista Harispe · Manuscrito y Recuerdos</div>
+        </div>
+        
+        <div class="header-actions">
+          <!-- Botón accesible para mover el libro sobre el escritorio (Desk Pan) -->
+          <button id="btnToggleDragMode" class="btn-header" aria-label="Mover libro sobre el escritorio" title="Mantené CTRL y arrastrá para mover el libro sobre el escritorio">
+            <span id="iconToggleDrag">✋</span>
+            <span id="textToggleDrag" class="btn-text-desktop">Mover libro (CTRL)</span>
+          </button>
+
+          <!-- Botón para alternar abrir/cerrar el libro -->
+          <button id="btnToggleBook" class="btn-header" aria-label="Abrir o cerrar el libro" title="Abrir o cerrar el libro">
+            <span id="iconToggleBook">📖</span>
+            <span id="textToggleBook" class="btn-text-desktop">Abrir libro</span>
+          </button>
+
+          <!-- Botón para recentrar en la mesa -->
+          <button id="btnResetPan" class="btn-header btn-subtle" aria-label="Centrar el libro en el escritorio" title="Centrar libro en el escritorio">
+            <span>⌖</span>
+            <span class="btn-text-desktop">Centrar</span>
+          </button>
+
+          <!-- Botón para cambiar ángulo de inclinación / visualización (B3) -->
+          <button id="btnToggleTilt" class="btn-header btn-subtle" aria-label="Cambiar inclinación de observación" title="Inclinación visual (o Shift + Arrastrar vertical)">
+            <span>📐</span>
+            <span class="btn-text-desktop">Inclinación</span>
+          </button>
+
+          <!-- Transcripción accesible -->
+          <button id="btnTranscription" class="btn-header" aria-label="Abrir transcripción accesible en texto plano">
+            <span>📄</span>
+            <span class="btn-text-desktop">Transcripción</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Indicador de modo agarre con dos manos (CTRL activo) -->
+      <div id="twoHandBadge" class="two-hand-badge" aria-live="polite">
+        <span class="badge-icon">👐</span>
+        <span>Sujeción estable con dos manos (CTRL)</span>
+      </div>
+
+      <!-- Escenario central: el libro físico sobre el escritorio -->
+      <main class="book-viewport" id="bookViewport" role="main">
+        <div class="book-pan-container" id="bookPanContainer">
+          <div class="book-container is-closed" id="bookContainer" aria-label="Libro físico interactivo apoyado en el escritorio">
+            <!-- Estructura generada dinámicamente por BookEngine -->
+          </div>
+        </div>
+      </main>
+
+      <!-- Barra inferior discreta con controles y navegación -->
+      <footer class="app-footer" role="contentinfo">
+        <div class="footer-controls-row">
+          
+          <!-- Botones de anterior / siguiente -->
+          <div class="nav-buttons-group">
+            <button id="btnPrev" class="btn-nav" aria-label="Página anterior" title="Página anterior (Flecha Izquierda)">
+              ‹
+            </button>
+            <button id="btnNext" class="btn-nav" aria-label="Página siguiente" title="Página siguiente (Flecha Derecha o Espacio)">
+              ›
+            </button>
+          </div>
+
+          <!-- Indicador sobrio de pliego actual -->
+          <div id="pageIndicator" class="page-indicator-text" aria-live="polite">
+            Libro cerrado sobre el escritorio
+          </div>
+
+          <!-- Indicaciones discretas de interacción física -->
+          <div class="desk-interaction-hints" id="deskHints">
+            <span class="hint-item"><span class="hint-icon">📖</span> Hojear: arrastrá las hojas libremente</span>
+            <span class="hint-separator">·</span>
+            <span class="hint-item"><span class="hint-icon">✋</span> Mover libro: mantené CTRL</span>
+            <span class="hint-separator">·</span>
+            <span class="hint-item"><span class="hint-icon">📐</span> Shift+arrastre: inclinación</span>
+          </div>
+
+        </div>
+      </footer>
+
+    </div>
+
+  </div>
+
+  <!-- Modal de lectura accesible y transcripción de texto -->
+  <div id="modalTranscription" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modalTitle">Transcripción de Lectura Accesible</h3>
+        <button id="btnCloseModal" class="btn-close-modal" aria-label="Cerrar transcripción">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="badge-fictional-notice">Contenido de prueba · Fase de prototipo</div>
+        <div id="transcriptionContent">
+          <!-- Inyectado dinámicamente -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Inicialización del módulo principal -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
