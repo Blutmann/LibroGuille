@@ -1,8 +1,10 @@
-# Node / Dependencias
+# Node / Dependencias / Logs
 node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+server.log
+ss-*
 
 # Sistema operativo
 .DS_Store

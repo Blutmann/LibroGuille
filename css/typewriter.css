@@ -33,12 +33,10 @@
   z-index: 1;
   pointer-events: none;
   overflow: hidden;
-  background-color: #0c0806;
-  background-image: 
-    radial-gradient(circle at 50% 50%, transparent 40%, rgba(8, 5, 4, 0.6) 85%, rgba(4, 2, 2, 0.95) 100%),
-    url('../assets/textures/moda-study-desk-scene.webp');
+  background-color: #120c08;
+  background-image: url('../assets/textures/bg-typewriter-study.webp');
   background-size: cover;
-  background-position: center center;
+  background-position: center bottom;
   background-repeat: no-repeat;
 }
 
@@ -836,6 +834,10 @@
 }
 
 @media (max-width: 960px) {
+  .study-room-backdrop {
+    background-position: 28% bottom;
+  }
+
   .study-desk-plane {
     display: none; /* Centrar máquina de escribir limpia en pantallas estrechas */
   }
@@ -843,6 +845,12 @@
   .study-boiserie-wall {
     height: 30vh;
     padding: 8px 12px 0 12px;
+  }
+}
+
+@media (max-width: 600px) {
+  .study-room-backdrop {
+    background-position: 24% bottom;
   }
 }
 

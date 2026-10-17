@@ -6,6 +6,13 @@ echo ======================================================
 echo   Iniciando prototipo: "Libro para mis hijos"
 echo ======================================================
 
+netstat -ano | findstr ":3000 " >nul 2>nul
+if %errorlevel% equ 0 (
+    echo [INFO] El servidor ya se encuentra activo en http://localhost:3000
+    start http://localhost:3000
+    goto end
+)
+
 set AGY_NODE="%APPDATA%\Antigravity\bin\agy-node.cmd"
 
 where node >nul 2>nul

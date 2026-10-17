@@ -64,7 +64,7 @@ async function evalInPage(expression) {
 console.log('--- TEST 1: Verifying Typewriter Scene ---');
 const twBg = await evalInPage(`window.getComputedStyle(document.querySelector('.study-room-backdrop')).backgroundImage`);
 const twPaperBg = await evalInPage(`window.getComputedStyle(document.querySelector('.typewriter-paper-sheet')).backgroundImage`);
-console.log('Typewriter backdrop image:', twBg.includes('moda-study-desk-scene.webp') ? 'PASS (moda-study-desk-scene.webp)' : twBg);
+console.log('Typewriter backdrop image:', twBg.includes('antique-study-backdrop.jpg') ? 'PASS (antique-study-backdrop.jpg)' : twBg);
 console.log('Typewriter paper sheet image:', twPaperBg.includes('moda-folded-rag-paper.webp') ? 'PASS (moda-folded-rag-paper.webp)' : twPaperBg);
 
 const ssTw = await send('Page.captureScreenshot', { format: 'png' });
@@ -73,10 +73,13 @@ console.log('Saved screenshot-p9-typewriter.png');
 
 console.log('--- TEST 2: Transitioning to Book Scene ---');
 await evalInPage(`document.getElementById('btnBypassTypewriter').click()`);
-await new Promise(r => setTimeout(r, 1000));
+await new Promise(r => setTimeout(r, 1600));
 
 const bookSceneVisible = await evalInPage(`!document.getElementById('sceneBook').classList.contains('is-hidden')`);
 console.log('Book scene visible:', bookSceneVisible);
+
+const deskBg = await evalInPage(`window.getComputedStyle(document.querySelector('.desk-surface')).backgroundImage`);
+console.log('Desk background image:', deskBg.includes('bg-book-desk.webp') ? 'PASS (bg-book-desk.webp)' : deskBg);
 
 const coverBg = await evalInPage(`window.getComputedStyle(document.querySelector('.book-cover-view')).backgroundImage`);
 console.log('Book cover image:', coverBg.includes('moda-book-front-cover.webp') ? 'PASS (moda-book-front-cover.webp)' : coverBg);

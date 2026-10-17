@@ -78,7 +78,7 @@ html, body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Superficie del escritorio antiguo de roble oscuro con fondo fotográfico del estudio MODA AI */
+/* Superficie del escritorio antiguo con la imagen adjunta N.º 2 original (bg-book-desk.webp) */
 .desk-surface {
   width: 100vw;
   height: 100vh;
@@ -90,11 +90,8 @@ html, body {
   overflow: hidden;
   padding: 10px 18px 14px 18px;
   
-  /* Composición fotorrealista de MODA AI: ambiente del estudio de época con lámpara y escritorio */
   background-color: #0c0806;
-  background-image: 
-    radial-gradient(circle at 50% 48%, transparent 45%, rgba(10, 7, 5, 0.65) 85%, rgba(4, 2, 2, 0.95) 100%),
-    url('../assets/textures/moda-study-desk-scene.webp');
+  background-image: url('../assets/textures/bg-book-desk.webp');
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
