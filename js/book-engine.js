@@ -1323,14 +1323,18 @@ export class BookEngine {
       if (pageData.sheetNumber === 1) {
         mainInnerHtml = `
           <div class="sheet-scrapbook-composition" aria-label="Composición documental: Primeros reconocimientos literarios (1951 - 1959)">
-            <!-- Columna izquierda: 1951, Biblioteca Popular Sarmiento -->
-            <div class="scrapbook-col col-sarmiento">
+            <!-- Bloque superior izquierdo: 1951, Biblioteca Popular Sarmiento -->
+            <div class="scrapbook-col scrapbook-item item-sarmiento col-sarmiento">
               <img src="assets/sheet-01/date-1951.png" alt="sept. 1.951 (fecha mecanografiada)" class="date-typewritten-1951" loading="eager">
-              <img src="assets/sheet-01/clipping-sarmiento-1951.png" alt="Recorte periodístico original: Biblioteca Popular 'Sarmiento' - Acto Literario, Segundo premio a Guillermo B. Harispe" class="clipping-card-1" loading="eager">
+              <div class="clipping-card-wrap wrap-sarmiento">
+                <img src="assets/sheet-01/clipping-sarmiento-1951.png" alt="Recorte periodístico original: Biblioteca Popular 'Sarmiento' - Acto Literario, Segundo premio a Guillermo B. Harispe" class="clipping-card-1" loading="eager">
+              </div>
             </div>
-            <!-- Columna derecha: 1959, Certamen René Bastianini -->
-            <div class="scrapbook-col col-bastianini">
-              <img src="assets/sheet-01/clipping-bastianini-1959.png" alt="Recorte periodístico original: El VI Certamen René Bastianini 1959 - Mención de honor a Guillermo B. Harispe" class="clipping-card-2" loading="eager">
+            <!-- Bloque escalonado inferior derecho: 1959, Certamen René Bastianini -->
+            <div class="scrapbook-col scrapbook-item item-bastianini col-bastianini">
+              <div class="clipping-card-wrap wrap-bastianini">
+                <img src="assets/sheet-01/clipping-bastianini-1959.png" alt="Recorte periodístico original: El VI Certamen René Bastianini 1959 - Mención de honor a Guillermo B. Harispe" class="clipping-card-2" loading="eager">
+              </div>
               <img src="assets/sheet-01/date-lanacion-1959.png" alt="LA NACIÓN 2/3 Dbre/59 (fecha manuscrita en birome azul)" class="date-handwritten-1959" loading="eager">
             </div>
           </div>
