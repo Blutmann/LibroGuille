@@ -250,10 +250,12 @@ html, body {
 .book-pan-container {
   position: relative;
   transform: translate3d(calc(var(--pan-x, 0px) + var(--closed-offset-x, 0px)), var(--pan-y, 0px), 0)
-             rotateX(calc(var(--view-pitch, 18deg) + var(--rot-x, 0deg)))
-             rotateZ(var(--rot-z, 0deg))
+             rotateX(calc(var(--view-pitch, 18deg) + var(--pan-rot-x, var(--rot-x, 0deg))))
+             rotateY(calc(var(--view-yaw, 0deg) + var(--pan-rot-y, var(--rot-y, 0deg))))
+             rotateZ(var(--pan-rot-z, var(--rot-z, 0deg)))
              scale(var(--book-scale, 1));
   transform-style: preserve-3d;
+  transform-origin: center center;
   transition: transform 0.14s ease-out;
   cursor: grab;
   user-select: none;

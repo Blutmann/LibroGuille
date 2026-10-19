@@ -16,3 +16,10 @@ desktop.ini
 .idea/
 *.swp
 *.swo
+
+# Capturas de verificación temporal
+screenshot-3d-*.png
+screenshot-clipping-*.png
+screenshot-quality-*.png
+screenshot-sheet-02-*.png
+tests/screenshots/

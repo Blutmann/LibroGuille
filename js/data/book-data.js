@@ -19,7 +19,7 @@ export const BOOK_METADATA = {
 };
 
 // Generación de las 35 hojas con numeración editorial fija (01/35 a 35/35)
-// La Hoja 01 contiene los recortes originales de 1951 y 1959; las hojas 02 a 35 quedan vacías para futuro contenido.
+// La Hoja 01 contiene los recortes originales de 1951 y 1959; la Hoja 02 contiene los recortes de Julio de 1961; las hojas 03 a 35 quedan vacías para futuro contenido.
 const emptySheets = Array.from({ length: TOTAL_SHEETS }, (_, idx) => {
   const sheetNum = idx + 1;
   const formattedNumber = `${String(sheetNum).padStart(2, '0')}/${TOTAL_SHEETS}`;
@@ -35,6 +35,20 @@ const emptySheets = Array.from({ length: TOTAL_SHEETS }, (_, idx) => {
       subtitle: "Biblioteca Popular Sarmiento y Certamen René Bastianini",
       image: "assets/sheet-01/sheet-01-composite.png",
       transcription: "Hoja 01/35: Primer recorte: 'sept. 1.951' - Biblioteca Popular Sarmiento :: Acto Literario. Segundo premio: 'Romance al tiempo mago', composición del alumno de la Escuela de Comercio, señor Guillermo B. Harispe Macchiavello. Segundo recorte: 'EL VI CERTAMEN RENÉ BASTIANINI 1959'. Jurado constituído por Jorge Luis Borges, Nicolás Cócaro y Carlos O. Bastianini. Mención de honor: 'Tierra en la lejanía', de Guillermo B. Harispe. Fecha manuscrita en birome azul: 'LA NACIÓN 2/3 Dbre/59'."
+    };
+  }
+
+  if (sheetNum === 2) {
+    return {
+      id: idx + 2,
+      sheetNumber: 2,
+      sheetLabel: formattedNumber,
+      type: "sheet",
+      side: "verso",
+      title: "Publicación de 'Trinchera del asombro' (Julio 1961)",
+      subtitle: "Poema 'Un niño dice', Soneto y Crítica de Ana Etchegoyen en El Argentino",
+      image: "assets/sheet-02/sheet-02-composite.png",
+      transcription: "Hoja 02/35: Primer recorte (fecha mecanografiada '8.7.61'): Poema 'Un niño dice:' ('Párpado de la noche pesado de tristeza que vienes con el huésped de la melancolía, un guillotinador cortará tu cabeza para que vuele un canto de pájaros al día...') y 'SONETO' ('No me llames así, deshabitado, frágil entre la sombra suspendido, vivir en plenitud es lo que pido y en el humo del sueño, demorado...'). Firma: Guillermo B. Harispe. Nota: 'El joven poeta de estos Sonetos, figura conocida de nuestro medio, pues aquí cursó sus estudios secundarios, acaba de publicar su primer libro de versos titulado Trinchera del Asombro... Ana Etchegoyen dijo de los poemas de Trinchera del Asombro: dentro de un verso libre, con acertada expresión y dinámica estructura, el espíritu del poeta, se mueve con acento de absoluta sinceridad. Talvez sea ésta y un trascendente sentimiento de humanidad, las dos característica más señaladas de Guillermo B. Harispe.' Segundo recorte (encabezado 'el argentino' y fecha '26.7.61'): Crítica literaria completa '\"Trinchera del asombro\" de GUILLERMO B. HARISPE por ANA ETCHEGOYEN'. Análisis de la obra poética con citas de 'Cuando la noche entorna sus párpados oscuros...', 'EN LA NOCHE' y 'POEMA'. Concluye: 'Con ese sentimiento y esa certidumbre, saludamos al autor de \"Trinchera del Asombro\". Gualeguaychú, Julio de 1961.'"
     };
   }
 

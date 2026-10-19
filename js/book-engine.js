@@ -29,8 +29,9 @@ export class BookEngine {
     this.isAnimating = false;
     this.isMobile = this.checkIfMobile();
 
-    // Inclinación visual de la cámara (-70° a +70°)
+    // Inclinación visual de la cámara en dos ejes (Pitch: -70° a +70°, Yaw: -45° a +45°)
     this.viewPitch = 16;
+    this.viewYaw = 0;
     this.pitchPresets = [
       { label: '0° · Neutro', pitch: 0 },
       { label: '16° · Lectura suave', pitch: 16 },
@@ -40,7 +41,7 @@ export class BookEngine {
     ];
     this.pitchIndex = 1;
 
-    // Escala del libro (0.65 a 1.75)
+    // Escala del libro (0.65 a 1.25)
     this.bookScale = 1.0;
     this.gestureStartScale = 1.0;
 
@@ -58,7 +59,8 @@ export class BookEngine {
     this.gestureStartCoverAngle = 0;
     this.gestureStartPanX = 0;
     this.gestureStartPanY = 0;
-    this.gestureStartPitch = 18;
+    this.gestureStartPitch = 16;
+    this.gestureStartYaw = 0;
     this.grabNormX = 0;
     this.grabNormY = 0;
     this.lastPointerX = 0;
@@ -69,7 +71,7 @@ export class BookEngine {
     this.activeLeafEl = null;
     this.leafProgress = 0; // 0.0 a 1.0
 
-    // Referencias DOM
+    // Referencias DOM base
     this.frontCoverEl = null;
     this.frontCoverBackContentEl = null;
     this.leftPageEl = null;
@@ -81,10 +83,31 @@ export class BookEngine {
     this.coverBackingEl = null;
     this.bookBodyEl = null;
 
+    // Referencias y estado de inspección de recortes en primer plano
+    this.sceneBookEl = document.getElementById('sceneBook');
+    this.clippingInspectionLayer = document.getElementById('clippingInspectionLayer');
+    this.clippingBackdrop = document.getElementById('clippingBackdrop');
+    this.clippingStage = document.getElementById('clippingStage');
+    this.clippingFloatingCard = document.getElementById('clippingFloatingCard');
+    this.clippingFloatingImg = document.getElementById('clippingFloatingImg');
+    this.btnCloseClipping = document.getElementById('btnCloseClipping');
+
+    this.isForegroundClippingActive = false;
+    this.isClippingAnimating = false;
+    this.activeClippingSourceEl = null;
+    this.clippingPanX = 0;
+    this.clippingPanY = 0;
+    this.clippingRotX = 0;
+    this.clippingRotY = 0;
+    this.clippingScale = 1.0;
+    this.sourceRotation = 0;
+
     // Callbacks
     this.onPageChange = options.onPageChange || (() => {});
     this.onTwoHandChange = options.onTwoHandChange || (() => {});
     this.onPitchChange = options.onPitchChange || (() => {});
+    this.onYawChange = options.onYawChange || (() => {});
+    this.onTiltChange = options.onTiltChange || (() => {});
     this.onScaleChange = options.onScaleChange || (() => {});
     this.onDragModeChange = options.onDragModeChange || (() => {});
 
@@ -97,12 +120,15 @@ export class BookEngine {
 
   init() {
     this.setupBookDom();
+    this.panContainer.style.setProperty('--view-pitch', `${this.viewPitch.toFixed(1)}deg`);
+    this.panContainer.style.setProperty('--view-yaw', `${this.viewYaw.toFixed(1)}deg`);
     this.applyCoverAngle(0, false);
     this.updateDynamicThickness();
     this.renderCurrentSpread();
     this.bindUnifiedGestureEvents();
     this.bindKeyboardModifiers();
     this.bindTouchSwipe();
+    this.bindClippingInspectionEvents();
 
     window.addEventListener('resize', () => {
       this.isMobile = this.checkIfMobile();
@@ -151,6 +177,12 @@ export class BookEngine {
       <div class="book-cover-backing" id="coverBacking"></div>
       <div class="book-closed-spine" id="closedSpine"></div>
       <div class="book-body" id="bookBody">
+        <!-- Cantos físicos tridimensionales (cabeza y pie del bloque de hojas) -->
+        <div class="page-block-head head-left" id="blockHeadLeft" aria-hidden="true"></div>
+        <div class="page-block-head head-right" id="blockHeadRight" aria-hidden="true"></div>
+        <div class="page-block-tail tail-left" id="blockTailLeft" aria-hidden="true"></div>
+        <div class="page-block-tail tail-right" id="blockTailRight" aria-hidden="true"></div>
+
         <!-- Página izquierda base (para páginas interiores currentIndex > 1) -->
         <div class="book-page page-left" id="pageLeft" aria-live="polite">
           <div class="page-turn-trigger corner-top-left" data-leaf-trigger="prev" title="Arrastrar para retroceder">
@@ -250,6 +282,8 @@ export class BookEngine {
       const maxEdge = this.generateLayeredEdgeShadow(22, 'right');
       this.container.style.setProperty('--right-edge-shadow', maxEdge);
       this.container.style.setProperty('--left-edge-shadow', 'none');
+      this.container.style.setProperty('--left-thickness', '0px');
+      this.container.style.setProperty('--right-thickness', '22px');
       return;
     }
 
@@ -266,6 +300,8 @@ export class BookEngine {
 
     this.container.style.setProperty('--left-edge-shadow', leftShadow);
     this.container.style.setProperty('--right-edge-shadow', rightShadow);
+    this.container.style.setProperty('--left-thickness', `${leftT}px`);
+    this.container.style.setProperty('--right-thickness', `${rightT}px`);
   }
 
   generateLayeredEdgeShadow(thickness, side) {
@@ -429,6 +465,7 @@ export class BookEngine {
   }
 
   openBook() {
+    if (this.isForegroundClippingActive) return;
     if (this.coverAngle >= 170) return;
     this.animateCoverTo(180, 520, () => {
       this.currentIndex = this.isMobile ? 2 : 1;
@@ -438,6 +475,7 @@ export class BookEngine {
   }
 
   closeBook() {
+    if (this.isForegroundClippingActive) return;
     if (this.coverAngle <= 5) return;
     if (this.currentIndex > 1) {
       this.currentIndex = this.isMobile ? 2 : 1;
@@ -450,6 +488,7 @@ export class BookEngine {
   }
 
   toggleBookOpenClose() {
+    if (this.isForegroundClippingActive) return;
     if (this.coverAngle < 90) {
       this.openBook();
     } else {
@@ -458,18 +497,46 @@ export class BookEngine {
   }
 
   // ==========================================================================
-  // INCLINACIÓN DE PERSPECTIVA (B3)
+  // INCLINACIÓN DE PERSPECTIVA BIDIMENSIONAL (PITCH / YAW) CON SHIFT
   // ==========================================================================
 
   setPitch(pitch) {
     this.viewPitch = Math.max(-70, Math.min(70, pitch));
     this.panContainer.style.setProperty('--view-pitch', `${this.viewPitch.toFixed(1)}deg`);
     this.onPitchChange(this.viewPitch);
+    if (typeof this.onTiltChange === 'function') {
+      this.onTiltChange({ pitch: this.viewPitch, yaw: this.viewYaw });
+    }
+  }
+
+  setYaw(yaw) {
+    this.viewYaw = Math.max(-45, Math.min(45, yaw));
+    this.panContainer.style.setProperty('--view-yaw', `${this.viewYaw.toFixed(1)}deg`);
+    if (typeof this.onYawChange === 'function') {
+      this.onYawChange(this.viewYaw);
+    }
+    if (typeof this.onTiltChange === 'function') {
+      this.onTiltChange({ pitch: this.viewPitch, yaw: this.viewYaw });
+    }
+  }
+
+  setTilt(pitch, yaw) {
+    this.viewPitch = Math.max(-70, Math.min(70, pitch));
+    this.viewYaw = Math.max(-45, Math.min(45, yaw));
+    this.panContainer.style.setProperty('--view-pitch', `${this.viewPitch.toFixed(1)}deg`);
+    this.panContainer.style.setProperty('--view-yaw', `${this.viewYaw.toFixed(1)}deg`);
+    this.onPitchChange(this.viewPitch);
+    if (typeof this.onYawChange === 'function') {
+      this.onYawChange(this.viewYaw);
+    }
+    if (typeof this.onTiltChange === 'function') {
+      this.onTiltChange({ pitch: this.viewPitch, yaw: this.viewYaw });
+    }
   }
 
   setPresetPitch(pitch) {
     this.panContainer.style.transition = 'transform 0.4s cubic-bezier(0.2, 0.85, 0.35, 1)';
-    this.setPitch(pitch);
+    this.setTilt(pitch, 0);
     const foundIndex = this.pitchPresets.findIndex(p => Math.abs(p.pitch - pitch) < 0.5);
     if (foundIndex !== -1) {
       this.pitchIndex = foundIndex;
@@ -490,7 +557,7 @@ export class BookEngine {
   // ==========================================================================
 
   setScale(scale) {
-    this.bookScale = Math.max(0.65, Math.min(1.75, scale));
+    this.bookScale = Math.max(0.65, Math.min(1.25, scale));
     this.panContainer.style.setProperty('--book-scale', this.bookScale.toFixed(3));
     this.onScaleChange(this.bookScale);
   }
@@ -520,10 +587,16 @@ export class BookEngine {
 
     const handlePointerDown = (e) => {
       if (e.button !== 0) return;
-      if (this.isAnimating) return;
+      if (this.isAnimating || this.isForegroundClippingActive) return;
 
       // Botones, controles y modales: dejar fluir el evento nativo
-      if (e.target.closest('button, a, input, [role="button"]:not(#frontCover), .modal-card, .scene-typewriter')) {
+      if (e.target.closest('button, a, input, [role="button"]:not(#frontCover), .modal-card, .scene-typewriter, #clippingInspectionLayer')) {
+        return;
+      }
+
+      // Si el usuario presiona sobre un recorte interactivo en una hoja abierta:
+      // Bloquear temporalmente el arrastre de la página para dar prioridad al recorte
+      if (e.target.closest('.clipping-card-wrap, [data-clipping="true"]') && !this.isClosed && this.coverAngle >= 150) {
         return;
       }
 
@@ -535,9 +608,10 @@ export class BookEngine {
         return;
       }
 
-      // GESTO 2: Inclinación de perspectiva (Pitch / Tilt) con SHIFT
+      // GESTO 2: Inclinación de perspectiva en dos ejes (Pitch / Yaw) con SHIFT
       if (e.shiftKey && !e.altKey && !e.ctrlKey) {
         e.preventDefault();
+        this.gestureStartPointerX = e.clientX;
         this.gestureStartPointerY = e.clientY;
         this.startPitchGesture(e);
         return;
@@ -606,11 +680,59 @@ export class BookEngine {
     };
 
     target.addEventListener('pointerdown', handlePointerDown);
+
+    // Detección de clic intencional en recortes periodísticos en hojas abiertas
+    let clippingPointerTarget = null;
+    let clippingPointerDownX = 0;
+    let clippingPointerDownY = 0;
+    let clippingPointerDownTime = 0;
+
+    this.container.addEventListener('pointerdown', (e) => {
+      if (this.isForegroundClippingActive || this.isClosed || this.coverAngle < 150) return;
+      const wrap = e.target.closest('.clipping-card-wrap, [data-clipping="true"]');
+      if (wrap) {
+        clippingPointerTarget = wrap;
+        clippingPointerDownX = e.clientX;
+        clippingPointerDownY = e.clientY;
+        clippingPointerDownTime = performance.now();
+      }
+    });
+
+    this.container.addEventListener('pointerup', (e) => {
+      if (!clippingPointerTarget || this.isForegroundClippingActive) {
+        clippingPointerTarget = null;
+        return;
+      }
+      const dist = Math.hypot(e.clientX - clippingPointerDownX, e.clientY - clippingPointerDownY);
+      const dt = performance.now() - clippingPointerDownTime;
+      const targetWrap = clippingPointerTarget;
+      clippingPointerTarget = null;
+
+      // Clic intencional sobre el recorte (sin arrastre amplio de página)
+      if (dist < 12 && dt < 600) {
+        e.preventDefault();
+        e.stopPropagation();
+        this.openForegroundClipping(targetWrap);
+      }
+    });
+
+    // Accesibilidad por teclado (Enter o Espacio sobre el recorte)
+    this.container.addEventListener('keydown', (e) => {
+      if (this.isForegroundClippingActive) return;
+      if (e.key === 'Enter' || e.key === ' ') {
+        const wrap = e.target.closest('.clipping-card-wrap, [data-clipping="true"]');
+        if (wrap) {
+          e.preventDefault();
+          e.stopPropagation();
+          this.openForegroundClipping(wrap);
+        }
+      }
+    });
   }
 
   // --- GESTO: Escala / Tamaño del libro con CTRL horizontal ---
   startScaleGesture(e) {
-    if (this.isMobile) return;
+    if (this.isMobile || this.isForegroundClippingActive) return;
     this.activeGesture = 'BOOK_SCALE';
     this.gestureStartScale = this.bookScale;
     this.gestureStartPointerX = e.clientX;
@@ -618,10 +740,10 @@ export class BookEngine {
 
     const handlePointerMove = (moveEvt) => {
       if (this.activeGesture !== 'BOOK_SCALE') return;
-      // Requisito: arrastrar a la izquierda aumenta el tamaño; arrastrar a la derecha lo reduce
+      // Dirección del zoom: CTRL + arrastrar a la derecha aumenta (+), a la izquierda reduce (-)
       const deltaX = moveEvt.clientX - this.gestureStartPointerX;
       const factor = 0.0035;
-      const newScale = Math.max(0.65, Math.min(1.75, this.gestureStartScale - (deltaX * factor)));
+      const newScale = Math.max(0.65, Math.min(1.25, this.gestureStartScale + (deltaX * factor)));
       this.setScale(newScale);
     };
 
@@ -637,33 +759,48 @@ export class BookEngine {
     window.addEventListener('pointerup', handlePointerUp);
   }
 
-  // --- GESTO: Inclinación de la vista con SHIFT (B3) ---
+  // --- GESTO: Inclinación de la vista en dos ejes con SHIFT (Pitch y Yaw combinados) ---
   startPitchGesture(e) {
+    if (this.isForegroundClippingActive) return;
     this.activeGesture = 'VIEW_PITCH';
     this.gestureStartPitch = this.viewPitch;
+    this.gestureStartYaw = this.viewYaw;
+    this.gestureStartPointerX = e.clientX;
+    this.gestureStartPointerY = e.clientY;
+    this.panContainer.classList.add('is-dragging');
     try { this.panContainer.setPointerCapture(e.pointerId); } catch (_) {}
 
     const handlePointerMove = (moveEvt) => {
       if (this.activeGesture !== 'VIEW_PITCH') return;
+      const deltaX = moveEvt.clientX - this.gestureStartPointerX;
       const deltaY = moveEvt.clientY - this.gestureStartPointerY;
-      const newPitch = this.gestureStartPitch - deltaY * 0.22;
-      this.setPitch(newPitch);
+      // Arrastrar verticalmente (arriba/abajo) inclina el cabeceo (pitch)
+      // Arrastrar horizontalmente (izq/der) inclina la orientación lateral (yaw)
+      // Movimientos diagonales combinan fluidamente ambos ejes con respuesta continua
+      const factor = 0.22;
+      const newPitch = this.gestureStartPitch - deltaY * factor;
+      const newYaw = this.gestureStartYaw + deltaX * factor;
+      this.setTilt(newPitch, newYaw);
     };
 
     const handlePointerUp = (upEvt) => {
       if (this.activeGesture !== 'VIEW_PITCH') return;
       this.activeGesture = null;
+      this.panContainer.classList.remove('is-dragging');
       try { this.panContainer.releasePointerCapture(upEvt.pointerId); } catch (_) {}
       window.removeEventListener('pointermove', handlePointerMove);
       window.removeEventListener('pointerup', handlePointerUp);
+      window.removeEventListener('pointercancel', handlePointerUp);
     };
 
     window.addEventListener('pointermove', handlePointerMove);
     window.addEventListener('pointerup', handlePointerUp);
+    window.addEventListener('pointercancel', handlePointerUp);
   }
 
   // --- GESTO: Apertura y Cierre de la Tapa ---
   startCoverDragGesture(e) {
+    if (this.isForegroundClippingActive) return;
     this.activeGesture = 'COVER';
     this.gestureStartCoverAngle = this.coverAngle;
     if (this.frontCoverEl) {
@@ -733,7 +870,7 @@ export class BookEngine {
   // ==========================================================================
 
   startPageDragGesture(e, direction) {
-    if (this.isAnimating) return;
+    if (this.isAnimating || this.isForegroundClippingActive) return;
 
     // Si estamos en la página 1 y se retrocede hacia la derecha, iniciar cierre de tapa
     if (direction === 'prev' && this.currentIndex <= 1) {
@@ -900,7 +1037,7 @@ export class BookEngine {
 
   // --- GESTO: Desplazamiento del Libro (Desk Pan) ---
   startBookPanGesture(e, isTwoHand) {
-    if (this.isMobile) return;
+    if (this.isMobile || this.isForegroundClippingActive) return;
     this.activeGesture = 'BOOK_PAN';
     this.isTwoHandMode = isTwoHand || e.altKey;
     this.panContainer.classList.add('is-dragging');
@@ -967,7 +1104,7 @@ export class BookEngine {
     this.panY = 0;
     this.rotX = 0;
     this.rotZ = 0;
-    this.setPitch(16);
+    this.setTilt(16, 0);
     this.setScale(1.0);
     this.applyPanTransform();
 
@@ -1018,11 +1155,13 @@ export class BookEngine {
     let touchStartY = 0;
 
     this.container.addEventListener('touchstart', (e) => {
+      if (this.isForegroundClippingActive) return;
       touchStartX = e.changedTouches[0].screenX;
       touchStartY = e.changedTouches[0].screenY;
     }, { passive: true });
 
     this.container.addEventListener('touchend', (e) => {
+      if (this.isForegroundClippingActive) return;
       const touchEndX = e.changedTouches[0].screenX;
       const touchEndY = e.changedTouches[0].screenY;
       const diffX = touchEndX - touchStartX;
@@ -1052,7 +1191,7 @@ export class BookEngine {
   }
 
   animatePageTurn(direction) {
-    if (this.isAnimating) return;
+    if (this.isAnimating || this.isForegroundClippingActive) return;
 
     if (direction === 'next') {
       if (this.coverAngle < 90) {
@@ -1320,16 +1459,35 @@ export class BookEngine {
             <!-- Bloque superior izquierdo: 1951, Biblioteca Popular Sarmiento -->
             <div class="scrapbook-col scrapbook-item item-sarmiento col-sarmiento">
               <img src="assets/sheet-01/date-1951.png" alt="sept. 1.951 (fecha mecanografiada)" class="date-typewritten-1951" loading="eager">
-              <div class="clipping-card-wrap wrap-sarmiento">
+              <div class="clipping-card-wrap wrap-sarmiento" tabindex="0" role="button" data-clipping="true" aria-label="Examinar recorte de Biblioteca Sarmiento (1951) en primer plano" title="Hacé clic para examinar este recorte en primer plano">
                 <img src="assets/sheet-01/clipping-sarmiento-1951.png" alt="Recorte periodístico original: Biblioteca Popular 'Sarmiento' - Acto Literario, Segundo premio a Guillermo B. Harispe" class="clipping-card-1" loading="eager">
               </div>
             </div>
             <!-- Bloque escalonado inferior derecho: 1959, Certamen René Bastianini -->
             <div class="scrapbook-col scrapbook-item item-bastianini col-bastianini">
-              <div class="clipping-card-wrap wrap-bastianini">
+              <div class="clipping-card-wrap wrap-bastianini" tabindex="0" role="button" data-clipping="true" aria-label="Examinar recorte del Certamen René Bastianini (1959) en primer plano" title="Hacé clic para examinar este recorte en primer plano">
                 <img src="assets/sheet-01/clipping-bastianini-1959.png" alt="Recorte periodístico original: El VI Certamen René Bastianini 1959 - Mención de honor a Guillermo B. Harispe" class="clipping-card-2" loading="eager">
               </div>
               <img src="assets/sheet-01/date-lanacion-1959.png" alt="LA NACIÓN 2/3 Dbre/59 (fecha manuscrita en birome azul)" class="date-handwritten-1959" loading="eager">
+            </div>
+          </div>
+        `;
+      } else if (pageData.sheetNumber === 2) {
+        mainInnerHtml = `
+          <div class="sheet-scrapbook-composition sheet-02-composition" aria-label="Composición documental: Publicación de Trinchera del asombro (Julio 1961)">
+            <!-- Bloque izquierdo: 8.7.61, Un niño dice / Soneto / Nota editorial -->
+            <div class="scrapbook-col scrapbook-item item-nino-dice col-nino-dice">
+              <img src="assets/sheet-02/date-1961-07-08.png" alt="8.7.61 (fecha mecanografiada)" class="date-typewritten-1961-left" loading="eager">
+              <div class="clipping-card-wrap wrap-nino-dice" tabindex="0" role="button" data-clipping="true" data-hires="assets/sheet-02/clipping-nino-dice-1961-hires.png" aria-label="Examinar recorte de Un niño dice: Soneto (1961) en primer plano" title="Hacé clic para examinar este recorte en primer plano">
+                <img src="assets/sheet-02/clipping-nino-dice-1961.png" data-hires="assets/sheet-02/clipping-nino-dice-1961-hires.png" alt="Recorte periodístico original: Un niño dice: Soneto y nota de Trinchera del Asombro por Guillermo B. Harispe (8 de julio de 1961)" class="clipping-card-nino" loading="eager">
+              </div>
+            </div>
+            <!-- Bloque derecho: 26.7.61, Diario El Argentino, Crítica de Ana Etchegoyen -->
+            <div class="scrapbook-col scrapbook-item item-trinchera col-trinchera">
+              <img src="assets/sheet-02/header-el-argentino-1961.png" alt="el argentino 26.7.61 (encabezado periodístico y fecha)" class="header-el-argentino-1961" loading="eager">
+              <div class="clipping-card-wrap wrap-trinchera" tabindex="0" role="button" data-clipping="true" data-hires="assets/sheet-02/clipping-trinchera-1961-hires.png" aria-label="Examinar recorte de Trinchera del asombro por Ana Etchegoyen (1961) en primer plano" title="Hacé clic para examinar este recorte en primer plano">
+                <img src="assets/sheet-02/clipping-trinchera-1961.png" data-hires="assets/sheet-02/clipping-trinchera-1961-hires.png" alt="Recorte periodístico original: Trinchera del asombro de Guillermo B. Harispe por Ana Etchegoyen, El Argentino (26 de julio de 1961)" class="clipping-card-trinchera" loading="eager">
+              </div>
             </div>
           </div>
         `;
@@ -1395,6 +1553,7 @@ export class BookEngine {
   }
 
   goToPage(pageIndex) {
+    if (this.isForegroundClippingActive) return;
     const maxIndex = this.pages.length - 2;
     const target = Math.max(0, Math.min(maxIndex, pageIndex));
     if (target === 0) {
@@ -1411,6 +1570,7 @@ export class BookEngine {
   }
 
   goToSheet(sheetNum) {
+    if (this.isForegroundClippingActive) return;
     if (sheetNum < 1 || sheetNum > 35) return;
     const targetPageIndex = sheetNum + 1; // hoja 1 está en el índice 2
     if (this.isClosed) {
@@ -1436,8 +1596,321 @@ export class BookEngine {
       canGoPrev: this.currentIndex > 0 || this.coverAngle > 10,
       visiblePages: this.getVisiblePages(),
       isDeskPanMode: this.isDeskPanMode,
-      isDragEnabled: this.isDeskPanMode
+      isDragEnabled: this.isDeskPanMode,
+      isForegroundClippingActive: this.isForegroundClippingActive,
+      viewPitch: this.viewPitch,
+      viewYaw: this.viewYaw
     };
     this.onPageChange(state);
   }
+
+  // ==========================================================================
+  // PRIMER PLANO: INSPECCIÓN INTERACTIVA DE RECORTES PERIODÍSTICOS
+  // ==========================================================================
+
+  openForegroundClipping(sourceWrapEl) {
+    if (this.isForegroundClippingActive || this.isClippingAnimating || this.isClosed) return;
+    if (!this.clippingInspectionLayer || !this.clippingFloatingCard || !this.clippingFloatingImg) return;
+
+    const imgEl = sourceWrapEl.querySelector('img') || sourceWrapEl;
+    if (!imgEl) return;
+
+    this.isForegroundClippingActive = true;
+    this.isClippingAnimating = true;
+    this.activeClippingSourceEl = sourceWrapEl;
+
+    // 1. Obtener rect del elemento fuente y del layer modal
+    const srcRect = imgEl.getBoundingClientRect();
+    const layerRect = this.clippingInspectionLayer.getBoundingClientRect();
+
+    const startLeft = srcRect.left - layerRect.left;
+    const startTop = srcRect.top - layerRect.top;
+
+    // 2. Extraer rotación del artículo en la página para continuidad visual
+    let initialAngle = 0;
+    const parentCol = sourceWrapEl.closest('.scrapbook-item, .scrapbook-col') || sourceWrapEl;
+    const computedStyle = window.getComputedStyle(parentCol);
+    const transform = computedStyle.transform;
+    if (transform && transform !== 'none') {
+      const values = transform.split('(')[1].split(')')[0].split(',');
+      const a = parseFloat(values[0]);
+      const b = parseFloat(values[1]);
+      initialAngle = Math.round(Math.atan2(b, a) * (180 / Math.PI) * 10) / 10;
+    }
+    this.sourceRotation = initialAngle;
+
+    // 3. Configurar la imagen del recorte en primer plano con carga progresiva de alta fidelidad
+    const baseSrc = imgEl.src;
+    const hiresCandidate = sourceWrapEl.dataset.hires || imgEl.dataset.hires || 
+                           sourceWrapEl.getAttribute('data-hires') || imgEl.getAttribute('data-hires');
+
+    // Iniciar inmediatamente con la imagen base (ya disponible en memoria, sin parpadeos)
+    this.clippingFloatingImg.src = baseSrc;
+    this.clippingFloatingImg.alt = imgEl.alt || 'Recorte periodístico original en primer plano';
+
+    // Cargar la versión master de alta resolución en segundo plano y sustituirla fluidamente
+    if (hiresCandidate && hiresCandidate !== baseSrc) {
+      const hiresLoader = new Image();
+      hiresLoader.onload = () => {
+        if (this.isForegroundClippingActive) {
+          this.clippingFloatingImg.src = hiresCandidate;
+        }
+      };
+      hiresLoader.src = hiresCandidate;
+    }
+
+    // 4. Dimensiones óptimas de lectura según viewport y proporciones originales
+    const naturalW = imgEl.naturalWidth || srcRect.width || 320;
+    const naturalH = imgEl.naturalHeight || srcRect.height || 650;
+    const aspect = naturalW / naturalH;
+
+    const viewportW = window.innerWidth;
+    const viewportH = window.innerHeight;
+
+    // Escala cómoda de lectura en primer plano
+    let targetH = Math.min(viewportH * 0.84, 760);
+    if (this.isMobile) {
+      targetH = Math.min(viewportH * 0.78, 560);
+    }
+    let targetW = targetH * aspect;
+    const maxTargetW = Math.min(viewportW * 0.88, 720);
+    if (targetW > maxTargetW) {
+      targetW = maxTargetW;
+      targetH = targetW / aspect;
+    }
+
+    const targetLeft = Math.round((viewportW - targetW) / 2) - layerRect.left;
+    const targetTop = Math.round((viewportH - targetH) / 2) - layerRect.top;
+
+    this.clippingPanX = 0;
+    this.clippingPanY = 0;
+    this.clippingRotX = 0;
+    this.clippingRotY = 0;
+    this.clippingScale = 1.0;
+
+    // 5. Configurar inicio FLIP (coincidente con la posición en la hoja o centrado de seguridad)
+    const card = this.clippingFloatingCard;
+    card.style.transition = 'none';
+    const hasValidSrcRect = srcRect.width > 20 && srcRect.height > 20;
+    const initLeft = hasValidSrcRect ? startLeft : targetLeft;
+    const initTop = hasValidSrcRect ? startTop : targetTop;
+    const initW = hasValidSrcRect ? srcRect.width : targetW;
+    const initH = hasValidSrcRect ? srcRect.height : targetH;
+
+    card.style.left = `${initLeft}px`;
+    card.style.top = `${initTop}px`;
+    card.style.width = `${initW}px`;
+    card.style.height = `${initH}px`;
+    card.style.transform = `translate3d(0, 0, 0) rotate(${initialAngle}deg)`;
+
+    // Mostrar modal y atenuar fuente original (deja su leve silueta en el papel)
+    this.clippingInspectionLayer.classList.remove('is-hidden');
+    if (this.sceneBookEl) {
+      this.sceneBookEl.classList.add('is-clipping-focus');
+    }
+    sourceWrapEl.style.opacity = '0.18';
+
+    // Reflujo sincrónico
+    void card.offsetWidth;
+
+    // 6. Animación de elevación y aproximación al primer plano
+    const animateToTarget = () => {
+      card.style.transition = 'all 0.52s cubic-bezier(0.16, 1, 0.3, 1)';
+      card.style.left = `${targetLeft}px`;
+      card.style.top = `${targetTop}px`;
+      card.style.width = `${targetW}px`;
+      card.style.height = `${targetH}px`;
+      card.style.transform = `translate3d(0, 0, 0) rotate(0deg)`;
+
+      setTimeout(() => {
+        card.style.transition = 'none';
+        this.isClippingAnimating = false;
+        try { card.focus(); } catch (_) {}
+      }, 540);
+    };
+
+    setTimeout(animateToTarget, 20);
+
+    this.notifyChange();
+  }
+
+  closeForegroundClipping() {
+    if (!this.isForegroundClippingActive || this.isClippingAnimating) return;
+    if (!this.clippingInspectionLayer || !this.clippingFloatingCard) return;
+
+    this.isClippingAnimating = true;
+
+    const card = this.clippingFloatingCard;
+    const sourceWrapEl = this.activeClippingSourceEl;
+    const imgEl = sourceWrapEl ? (sourceWrapEl.querySelector('img') || sourceWrapEl) : null;
+    const layerRect = this.clippingInspectionLayer.getBoundingClientRect();
+
+    // Eliminar desenfoque ambiental del libro
+    if (this.sceneBookEl) {
+      this.sceneBookEl.classList.remove('is-clipping-focus');
+    }
+
+    // Comenzar el desvanecimiento de vuelta a opacidad 1 en la hoja
+    if (sourceWrapEl) {
+      sourceWrapEl.style.opacity = '1';
+    }
+
+    const returnAngle = this.sourceRotation || 0;
+
+    if (imgEl) {
+      const srcRect = imgEl.getBoundingClientRect();
+      const endLeft = srcRect.left - layerRect.left;
+      const endTop = srcRect.top - layerRect.top;
+
+      card.style.transition = 'all 0.44s cubic-bezier(0.25, 1, 0.5, 1)';
+      card.style.left = `${endLeft}px`;
+      card.style.top = `${endTop}px`;
+      card.style.width = `${srcRect.width}px`;
+      card.style.height = `${srcRect.height}px`;
+      card.style.transform = `translate3d(0, 0, 0) rotate(${returnAngle}deg)`;
+    } else {
+      card.style.transition = 'opacity 0.35s ease, transform 0.35s ease';
+      card.style.opacity = '0';
+      card.style.transform = 'scale(0.85)';
+    }
+
+    setTimeout(() => {
+      if (sourceWrapEl) {
+        sourceWrapEl.style.opacity = '';
+      }
+      this.clippingInspectionLayer.classList.add('is-hidden');
+      card.style.transition = 'none';
+      card.style.transform = 'none';
+      card.style.opacity = '1';
+
+      this.isForegroundClippingActive = false;
+      this.isClippingAnimating = false;
+      this.activeClippingSourceEl = null;
+      this.clippingPanX = 0;
+      this.clippingPanY = 0;
+      this.clippingRotX = 0;
+      this.clippingRotY = 0;
+      this.clippingScale = 1.0;
+
+      this.notifyChange();
+    }, 450);
+  }
+
+  bindClippingInspectionEvents() {
+    if (!this.clippingInspectionLayer || !this.clippingFloatingCard) return;
+
+    // MECANISMO C: Control visual de regreso
+    if (this.btnCloseClipping) {
+      this.btnCloseClipping.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.closeForegroundClipping();
+      });
+    }
+
+    // MECANISMO A: Clic fuera del recorte (en cualquier área del fondo atenuado)
+    let backdropDownX = 0;
+    let backdropDownY = 0;
+    let backdropDownTime = 0;
+
+    if (this.clippingBackdrop) {
+      this.clippingBackdrop.addEventListener('pointerdown', (e) => {
+        backdropDownX = e.clientX;
+        backdropDownY = e.clientY;
+        backdropDownTime = performance.now();
+      });
+
+      this.clippingBackdrop.addEventListener('pointerup', (e) => {
+        const dist = Math.hypot(e.clientX - backdropDownX, e.clientY - backdropDownY);
+        const dt = performance.now() - backdropDownTime;
+        // Distinguir clic intencional de soltar un arrastre del recorte
+        if (dist < 10 && dt < 450) {
+          this.closeForegroundClipping();
+        }
+      });
+    }
+
+    // MANIPULACIÓN INDEPENDIENTE DEL RECORTE EN PRIMER PLANO
+    // ALT + arrastrar: Mover el recorte en el espacio
+    // SHIFT + arrastrar: Inclinar el recorte
+    // CTRL + arrastrar horizontal: Cambiar la escala (arrastrar a la izquierda aumenta, a la derecha reduce)
+    // Sin modificadores: Arrastrar el recorte suavemente sin afectar al libro
+    let isManipulating = false;
+    let manipStartX = 0;
+    let manipStartY = 0;
+    let startPanX = 0;
+    let startPanY = 0;
+    let startRotX = 0;
+    let startRotY = 0;
+    let startScale = 1.0;
+    let manipMode = 'PAN';
+
+    const updateCardTransform = () => {
+      const maxPanX = window.innerWidth * 0.38;
+      const maxPanY = window.innerHeight * 0.38;
+      this.clippingPanX = Math.max(-maxPanX, Math.min(maxPanX, this.clippingPanX));
+      this.clippingPanY = Math.max(-maxPanY, Math.min(maxPanY, this.clippingPanY));
+      this.clippingRotX = Math.max(-48, Math.min(48, this.clippingRotX));
+      this.clippingRotY = Math.max(-48, Math.min(48, this.clippingRotY));
+      this.clippingScale = Math.max(0.6, Math.min(2.4, this.clippingScale));
+
+      this.clippingFloatingCard.style.transform = `translate3d(${this.clippingPanX}px, ${this.clippingPanY}px, 60px) rotateX(${this.clippingRotX}deg) rotateY(${this.clippingRotY}deg) scale(${this.clippingScale})`;
+    };
+
+    this.clippingFloatingCard.addEventListener('pointerdown', (e) => {
+      if (this.isClippingAnimating || !this.isForegroundClippingActive) return;
+      e.stopPropagation();
+      isManipulating = true;
+      manipStartX = e.clientX;
+      manipStartY = e.clientY;
+      startPanX = this.clippingPanX;
+      startPanY = this.clippingPanY;
+      startRotX = this.clippingRotX;
+      startRotY = this.clippingRotY;
+      startScale = this.clippingScale;
+
+      if (e.ctrlKey) {
+        manipMode = 'SCALE';
+      } else if (e.shiftKey) {
+        manipMode = 'TILT';
+      } else {
+        manipMode = 'PAN'; // ALT o arrastre directo
+      }
+
+      this.clippingFloatingCard.classList.add('is-dragging');
+      try { this.clippingFloatingCard.setPointerCapture(e.pointerId); } catch (_) {}
+    });
+
+    window.addEventListener('pointermove', (e) => {
+      if (!isManipulating || !this.isForegroundClippingActive) return;
+      e.preventDefault();
+
+      const dx = e.clientX - manipStartX;
+      const dy = e.clientY - manipStartY;
+
+      if (manipMode === 'SCALE') {
+        // Dirección del zoom: CTRL + arrastrar a la derecha aumenta (+), a la izquierda reduce (-)
+        const factor = 0.0035;
+        this.clippingScale = Math.max(0.6, Math.min(2.4, startScale + (dx * factor)));
+      } else if (manipMode === 'TILT') {
+        this.clippingRotX = startRotX - (dy * 0.28);
+        this.clippingRotY = startRotY + (dx * 0.28);
+      } else {
+        this.clippingPanX = startPanX + dx;
+        this.clippingPanY = startPanY + dy;
+      }
+
+      updateCardTransform();
+    });
+
+    const handlePointerUp = (e) => {
+      if (!isManipulating) return;
+      isManipulating = false;
+      this.clippingFloatingCard.classList.remove('is-dragging');
+      try { this.clippingFloatingCard.releasePointerCapture(e.pointerId); } catch (_) {}
+    };
+
+    window.addEventListener('pointerup', handlePointerUp);
+    window.addEventListener('pointercancel', handlePointerUp);
+  }
 }
+

@@ -288,10 +288,42 @@
             <span class="hint-item"><span class="hint-icon">📐</span> Inclinación: Shift+arrastre</span>
             <span class="hint-separator">·</span>
             <span class="hint-item"><span class="hint-icon">🔍</span> Tamaño: Ctrl+arrastre</span>
+            <span class="hint-separator">·</span>
+            <span class="hint-item"><span class="hint-icon">🔎</span> Recortes: clic para examinar</span>
           </div>
 
         </div>
       </footer>
+
+      <!-- Escenario de Inspección en Primer Plano de Recortes Periodísticos -->
+      <div id="clippingInspectionLayer" class="clipping-inspection-layer is-hidden" role="dialog" aria-modal="true" aria-label="Inspección detallada de recorte periodístico">
+        <!-- Fondo atenuado y sensible al clic intencional de salida -->
+        <div class="clipping-backdrop" id="clippingBackdrop" title="Hacé clic fuera del recorte para volver al libro"></div>
+        
+        <!-- Escenario 3D del recorte flotante -->
+        <div class="clipping-stage" id="clippingStage">
+          <div class="clipping-floating-card" id="clippingFloatingCard" tabindex="0" role="region" aria-label="Recorte periodístico interactivo">
+            <img id="clippingFloatingImg" src="" alt="" class="clipping-floating-img" draggable="false">
+          </div>
+        </div>
+
+        <!-- Barra inferior con instrucciones y control visual de regreso -->
+        <div class="clipping-inspection-bar" id="clippingInspectionBar">
+          <div class="clipping-hints-badge" id="clippingHintsBadge">
+            <span class="hint-subitem"><span class="hint-key">Alt+arrastre:</span> mover</span>
+            <span class="hint-subsep">·</span>
+            <span class="hint-subitem"><span class="hint-key">Shift+arrastre:</span> inclinar</span>
+            <span class="hint-subsep">·</span>
+            <span class="hint-subitem"><span class="hint-key">Ctrl+arrastre:</span> tamaño</span>
+            <span class="hint-subsep">·</span>
+            <span class="hint-subitem"><span class="hint-key">Clic fuera o Esc:</span> volver</span>
+          </div>
+          <button type="button" id="btnCloseClipping" class="btn-clipping-close" aria-label="Volver al libro (Esc o clic fuera)" title="Volver al libro (Esc)">
+            <span class="close-icon" aria-hidden="true">↩</span>
+            <span class="close-text">Volver al libro</span>
+          </button>
+        </div>
+      </div>
 
     </div>
 

@@ -69,11 +69,17 @@ async function evalInPage(expression) {
 try {
   console.log('=== TEST SUITE: 35 HOJAS VACÍAS (Guillermo Harispe) ===\n');
 
-  // Check initial state
+  // Wait until page is fully loaded and window.book is initialized
+  for (let i = 0; i < 35; i++) {
+    const ready = await evalInPage(`!!window.book && !!document.getElementById('btnToggleBook')`);
+    if (ready) break;
+    await new Promise(r => setTimeout(r, 200));
+  }
+
   const title = await evalInPage(`document.title`);
   console.log('Page Title:', title);
 
-  // Transition to book scene by clicking typewriter or calling directly
+  // Transition to book scene
   await evalInPage(`
     const ts = document.getElementById('sceneTypewriter');
     const bs = document.getElementById('sceneBook');
@@ -83,18 +89,20 @@ try {
     }
   `);
 
-  // Open book
-  await evalInPage(`
-    if (window.appBook) {
-      window.appBook.openBook();
-    } else {
-      const btn = document.getElementById('btnToggleBook');
-      if (btn) btn.click();
-    }
-  `);
+  // Open book directly
+  await evalInPage(`window.book.openBook();`);
 
-  // Wait for cover animation
-  await new Promise(r => setTimeout(r, 800));
+  // Wait for cover animation to settle
+  for (let i = 0; i < 25; i++) {
+    const isOpened = await evalInPage(`
+      (() => {
+        const ind = document.getElementById('pageIndicator');
+        return ind && ind.textContent.includes('01/35');
+      })()
+    `);
+    if (isOpened) break;
+    await new Promise(r => setTimeout(r, 150));
+  }
 
   // Check metadata
   const metadata = await evalInPage(`
@@ -138,7 +146,7 @@ try {
 
   // Click next to advance to Spread 2 (Hoja 02/35 y Hoja 03/35)
   await evalInPage(`document.getElementById('btnNext').click();`);
-  await new Promise(r => setTimeout(r, 900));
+  await new Promise(r => setTimeout(r, 1600));
 
   const spread2 = await evalInPage(`
     (() => {
@@ -164,7 +172,11 @@ try {
   console.log('\nVerificando secuencia completa de pliegos hasta 35/35...');
   for (let s = 3; s <= 18; s++) {
     await evalInPage(`document.getElementById('btnNext').click();`);
-    await new Promise(r => setTimeout(r, 850));
+    for (let w = 0; w < 25; w++) {
+      await new Promise(r => setTimeout(r, 80));
+      const busy = await evalInPage(`window.book.isAnimating`);
+      if (!busy) break;
+    }
   }
 
   const finalSpread = await evalInPage(`

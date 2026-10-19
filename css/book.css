@@ -72,6 +72,176 @@
   visibility: hidden !important;
 }
 
+/* ==========================================================================
+   CANTOS FÍSICOS TRIDIMENSIONALES: CABEZA (SUPERIOR) Y PIE (INFERIOR)
+   Estratificación volumétrica de cuadernillos con textura de papel y sombras
+   ========================================================================== */
+
+.page-block-head,
+.page-block-tail {
+  position: absolute;
+  pointer-events: none;
+  z-index: 8;
+  backface-visibility: visible;
+  -webkit-backface-visibility: visible;
+  background-color: var(--paper-ivory, #f7f3e8);
+  transition: height 0.4s ease, opacity 0.3s ease;
+}
+
+.page-block-head {
+  top: 0;
+  transform-origin: top center;
+  transform: rotateX(-90deg);
+}
+
+.page-block-tail {
+  bottom: 0;
+  transform-origin: bottom center;
+  transform: rotateX(90deg);
+}
+
+.page-block-head.head-left {
+  left: 0;
+  width: 50%;
+  height: var(--left-thickness, 11px);
+  background-image: 
+    repeating-linear-gradient(
+      to bottom,
+      #fefcf6 0px,
+      #fefcf6 1px,
+      #ece3cb 1.5px,
+      #ded1b6 2px,
+      #f8f2e2 2.5px,
+      #cbbba0 3px,
+      #b39e7c 3.5px
+    ),
+    linear-gradient(
+      to right,
+      rgba(15, 10, 5, 0.45) 0%,
+      rgba(25, 18, 10, 0.15) 15px,
+      rgba(0, 0, 0, 0.04) 50%,
+      rgba(25, 18, 10, 0.25) calc(100% - 20px),
+      rgba(18, 12, 6, 0.6) 100%
+    ),
+    linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.4) 0%,
+      transparent 20%,
+      rgba(0, 0, 0, 0.25) 75%,
+      rgba(0, 0, 0, 0.6) 100%
+    );
+  box-shadow: inset 0 -1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.page-block-head.head-right {
+  left: 50%;
+  width: 50%;
+  height: var(--right-thickness, 20px);
+  background-image: 
+    repeating-linear-gradient(
+      to bottom,
+      #fefcf6 0px,
+      #fefcf6 1px,
+      #ece3cb 1.5px,
+      #ded1b6 2px,
+      #f8f2e2 2.5px,
+      #cbbba0 3px,
+      #b39e7c 3.5px
+    ),
+    linear-gradient(
+      to right,
+      rgba(18, 12, 6, 0.6) 0%,
+      rgba(25, 18, 10, 0.25) 20px,
+      rgba(0, 0, 0, 0.04) 50%,
+      rgba(25, 18, 10, 0.15) calc(100% - 15px),
+      rgba(15, 10, 5, 0.45) 100%
+    ),
+    linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.4) 0%,
+      transparent 20%,
+      rgba(0, 0, 0, 0.25) 75%,
+      rgba(0, 0, 0, 0.6) 100%
+    );
+  box-shadow: inset 0 -1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.page-block-tail.tail-left {
+  left: 0;
+  width: 50%;
+  height: var(--left-thickness, 11px);
+  background-image: 
+    repeating-linear-gradient(
+      to top,
+      #fefcf6 0px,
+      #fefcf6 1px,
+      #ece3cb 1.5px,
+      #ded1b6 2px,
+      #f8f2e2 2.5px,
+      #cbbba0 3px,
+      #b39e7c 3.5px
+    ),
+    linear-gradient(
+      to right,
+      rgba(15, 10, 5, 0.45) 0%,
+      rgba(25, 18, 10, 0.18) 15px,
+      rgba(0, 0, 0, 0.05) 50%,
+      rgba(25, 18, 10, 0.28) calc(100% - 20px),
+      rgba(18, 12, 6, 0.6) 100%
+    ),
+    linear-gradient(
+      to top,
+      rgba(255, 255, 255, 0.35) 0%,
+      transparent 20%,
+      rgba(0, 0, 0, 0.3) 75%,
+      rgba(0, 0, 0, 0.7) 100%
+    );
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.page-block-tail.tail-right {
+  left: 50%;
+  width: 50%;
+  height: var(--right-thickness, 20px);
+  background-image: 
+    repeating-linear-gradient(
+      to top,
+      #fefcf6 0px,
+      #fefcf6 1px,
+      #ece3cb 1.5px,
+      #ded1b6 2px,
+      #f8f2e2 2.5px,
+      #cbbba0 3px,
+      #b39e7c 3.5px
+    ),
+    linear-gradient(
+      to right,
+      rgba(18, 12, 6, 0.6) 0%,
+      rgba(25, 18, 10, 0.28) 20px,
+      rgba(0, 0, 0, 0.05) 50%,
+      rgba(25, 18, 10, 0.18) calc(100% - 15px),
+      rgba(15, 10, 5, 0.45) 100%
+    ),
+    linear-gradient(
+      to top,
+      rgba(255, 255, 255, 0.35) 0%,
+      transparent 20%,
+      rgba(0, 0, 0, 0.3) 75%,
+      rgba(0, 0, 0, 0.7) 100%
+    );
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* En portada o libro cerrado: ocultar los bloques izquierdos */
+.book-container.is-cover-view .head-left,
+.book-container.is-cover-view .tail-left,
+.book-container.is-closed .head-left,
+.book-container.is-closed .tail-left {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+}
+
 /* Lomo redondeado de encuadernación artesanal para libro cerrado (en el eje central del tomo) */
 .book-closed-spine {
   position: absolute;
@@ -804,11 +974,12 @@
   position: relative;
   display: block;
   width: 100%;
+  cursor: zoom-in;
   /* drop-shadow se ciñe con precisión subpíxel al contorno de tijera del canal alfa */
   filter: 
     drop-shadow(0 1.5px 3px rgba(35, 24, 12, 0.28))
     drop-shadow(0 5px 14px rgba(25, 16, 8, 0.16));
-  transition: filter 0.25s ease;
+  transition: filter 0.25s ease, transform 0.2s ease, opacity 0.3s ease;
 }
 
 .clipping-card-wrap:hover {
@@ -818,7 +989,9 @@
 }
 
 .clipping-card-1,
-.clipping-card-2 {
+.clipping-card-2,
+.clipping-card-nino,
+.clipping-card-trinchera {
   width: 100%;
   height: auto;
   display: block;
@@ -826,6 +999,71 @@
   box-shadow: none; /* Reemplazado por drop-shadow en el contenedor envolvente */
   user-select: none;
   pointer-events: auto;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: high-quality;
+}
+
+/* ==========================================================================
+   COMPOSICIÓN DOCUMENTAL ARCHIVÍSTICA — HOJA 02/35
+   Publicación de "Trinchera del Asombro" de Guillermo B. Harispe (Julio 1961)
+   ========================================================================== */
+
+/* Bloque izquierdo: Poema "Un niño dice", Soneto y Nota editorial (8.7.61) */
+.item-nino-dice {
+  position: absolute;
+  top: 8px;
+  left: 14px;
+  width: 42.5%;
+  max-width: 174px;
+  z-index: 2;
+  transform: rotate(-0.65deg);
+  transform-origin: 15% 15%;
+}
+
+.item-nino-dice:hover {
+  transform: rotate(-0.25deg) scale(1.015);
+  z-index: 10;
+}
+
+.date-typewritten-1961-left {
+  width: 68%;
+  max-width: 115px;
+  height: auto;
+  margin-bottom: 5px;
+  margin-left: 2px;
+  mix-blend-mode: multiply;
+  transform: rotate(-0.25deg);
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Bloque derecho: Diario El Argentino, Crítica de Ana Etchegoyen (26.7.61) */
+.item-trinchera {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 44.5%;
+  max-width: 182px;
+  z-index: 3;
+  transform: rotate(0.75deg);
+  transform-origin: 85% 20%;
+}
+
+.item-trinchera:hover {
+  transform: rotate(0.35deg) scale(1.015);
+  z-index: 10;
+}
+
+.header-el-argentino-1961 {
+  width: 92%;
+  max-width: 156px;
+  height: auto;
+  margin-bottom: 6px;
+  margin-left: 2px;
+  mix-blend-mode: multiply;
+  transform: rotate(0.2deg);
+  user-select: none;
+  pointer-events: none;
 }
 
 /* Pie de hoja discreto con numeración editorial alineada a la derecha (ej: 01/35) */
@@ -1250,7 +1488,193 @@
   .date-handwritten-1959 {
     margin-top: 6px;
   }
+
+  /* Adaptación de composición Hoja 02 en pantallas móviles */
+  .item-nino-dice {
+    width: 44%;
+    left: 8px;
+    top: 6px;
+  }
+  .item-trinchera {
+    width: 44%;
+    right: 8px;
+    top: 12px;
+  }
+  .date-typewritten-1961-left {
+    margin-bottom: 4px;
+  }
+  .header-el-argentino-1961 {
+    margin-bottom: 4px;
+  }
+
   .sheet-footer {
     padding: 4px 12px 2px 0;
   }
+
+  .clipping-hints-badge {
+    display: none;
+  }
+
+  .clipping-inspection-bar {
+    bottom: 14px;
+  }
+
+  .btn-clipping-close {
+    padding: 8px 16px;
+    font-size: 0.82rem;
+  }
+}
+
+/* ==========================================================================
+   MODO PRIMER PLANO: INSPECCIÓN INTERACTIVA DE RECORTES PERIODÍSTICOS
+   ========================================================================== */
+
+/* Desenfoque y atenuación ambiental del libro y la interfaz */
+.scene-book.is-clipping-focus .book-viewport,
+.scene-book.is-clipping-focus .app-header,
+.scene-book.is-clipping-focus .app-footer {
+  filter: blur(5px) brightness(0.8);
+  transition: filter 0.45s cubic-bezier(0.2, 0, 0.2, 1);
+  pointer-events: none !important;
+  user-select: none !important;
+}
+
+/* Capa modal de inspección */
+.clipping-inspection-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  pointer-events: auto;
+}
+
+.clipping-inspection-layer.is-hidden {
+  display: none !important;
+  pointer-events: none !important;
+}
+
+/* Telón de fondo con atenuación y captura de clic de salida */
+.clipping-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(12, 8, 4, 0.38);
+  cursor: pointer;
+  z-index: 1;
+  opacity: 1;
+  transition: opacity 0.4s ease;
+}
+
+/* Escenario con perspectiva 3D */
+.clipping-stage {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 1400px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Tarjeta flotante del recorte */
+.clipping-floating-card {
+  position: absolute;
+  pointer-events: auto;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+  transform-style: preserve-3d;
+  filter: 
+    drop-shadow(0 20px 45px rgba(18, 10, 4, 0.55)) 
+    drop-shadow(0 5px 14px rgba(0, 0, 0, 0.42));
+}
+
+.clipping-floating-card:active,
+.clipping-floating-card.is-dragging {
+  cursor: grabbing;
+}
+
+.clipping-floating-img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: fill;
+  pointer-events: none;
+  user-select: none;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: high-quality;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Barra inferior con atajos y botón de regreso */
+.clipping-inspection-bar {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  z-index: 10;
+  pointer-events: auto;
+}
+
+.clipping-hints-badge {
+  background: rgba(26, 17, 10, 0.92);
+  border: 1px solid rgba(212, 175, 55, 0.42);
+  border-radius: 20px;
+  padding: 6px 16px;
+  font-size: 0.78rem;
+  color: #dfd2be;
+  font-family: var(--font-sans, system-ui, -apple-system, sans-serif);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+  user-select: none;
+}
+
+.clipping-hints-badge .hint-key {
+  color: #d4af37;
+  font-weight: 600;
+}
+
+.clipping-hints-badge .hint-subsep {
+  color: rgba(212, 175, 55, 0.35);
+}
+
+.btn-clipping-close {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, rgba(46, 32, 18, 0.95), rgba(28, 18, 10, 0.95));
+  border: 1px solid rgba(212, 175, 55, 0.65);
+  color: #f7f1e1;
+  padding: 7px 18px;
+  border-radius: 20px;
+  font-size: 0.84rem;
+  font-family: var(--font-serif, "Georgia", serif);
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: all 0.22s ease;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+  outline: none;
+}
+
+.btn-clipping-close:hover,
+.btn-clipping-close:focus-visible {
+  background: linear-gradient(135deg, rgba(64, 44, 25, 0.98), rgba(42, 28, 16, 0.98));
+  border-color: rgba(240, 205, 90, 0.9);
+  color: #fffdf5;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+}
+
+.btn-clipping-close:active {
+  transform: translateY(1px);
 }

@@ -255,6 +255,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (e.key === 'Escape') {
+      if (book.isForegroundClippingActive) {
+        book.closeForegroundClipping();
+        return;
+      }
       if (tiltMenu && !tiltMenu.classList.contains('is-hidden')) {
         tiltMenu.classList.add('is-hidden');
         return;
@@ -265,7 +269,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    if (modalTranscription.classList.contains('active')) return;
+    if (modalTranscription.classList.contains('active') || book.isForegroundClippingActive) return;
 
     if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') {
       e.preventDefault();
