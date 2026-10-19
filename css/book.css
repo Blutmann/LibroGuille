@@ -278,8 +278,8 @@
   position: absolute;
   right: 32px;
   bottom: 40px;
-  width: 176px;
-  height: 136px;
+  width: 184px;
+  height: 118px;
   padding: 6px 7px 7px 7px;
   border-radius: 3px;
   /* Película transparente donde se aprecia el fondo de tela con leve brillo */
@@ -310,7 +310,7 @@
     radial-gradient(circle at 45% 40%, #f6ecd0 0%, #ebdea9 60%, #decb8e 100%),
     linear-gradient(135deg, rgba(255, 255, 255, 0.16) 0%, transparent 40%, rgba(120, 95, 45, 0.09) 100%);
   border-radius: 2px;
-  padding: 12px 14px 10px 14px;
+  padding: 4px 6px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -336,74 +336,16 @@
   opacity: 0.9;
 }
 
-/* Texto de la tarjeta: letra de imprenta manuscrita (referencia a la birome de Guillermo) */
-.card-handwritten-text {
+/* Réplica exacta de la caligrafía original de Guillermo Bautista Harispe (1984) */
+.card-original-handwriting-img {
   width: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  font-family: 'Patrick Hand', 'Nanum Pen Script', 'Segoe Print', cursive, sans-serif;
-  line-height: 1.15;
-  font-weight: 400;
-  color: #173866; /* Tinta azul vintage de birome */
-  letter-spacing: 0.03em;
-  text-shadow: 0 0 0.4px rgba(23, 56, 102, 0.4);
+  height: 100%;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+  filter: contrast(1.10) drop-shadow(0 0 0.4px rgba(20, 50, 95, 0.4));
   position: relative;
   z-index: 2;
   user-select: none;
-}
-
-.card-handwritten-text .card-line {
-  display: block;
-}
-
-.card-handwritten-text .card-line-1 {
-  font-size: 1.30rem;
-  letter-spacing: 0.025em;
-}
-
-.card-handwritten-text .card-line-2 {
-  font-size: 1.18rem;
-  margin-top: -1px;
-}
-
-.card-handwritten-text .card-line-3 {
-  font-size: 1.28rem;
-  margin-top: -1px;
-}
-
-.card-handwritten-text .card-line-4 {
-  font-size: 1.24rem;
-  margin-top: 3px;
-  color: #183a6b;
-  letter-spacing: 0.035em;
-  display: inline-flex;
-  align-items: baseline;
-  justify-content: center;
-  gap: 6px;
-}
-
-.card-word-papa {
-  position: relative;
-  display: inline-flex;
-  align-items: baseline;
-}
-
-.underlined-apa {
-  position: relative;
-  display: inline-block;
-}
-
-/* Subrayado artesanal fino y discreto debajo de "apá", con suave pendiente descendente */
-.hand-drawn-underline {
-  position: absolute;
-  left: 0;
-  bottom: -2.5px;
-  width: 100%;
-  height: 5px;
-  overflow: visible;
   pointer-events: none;
 }
 
@@ -499,13 +441,9 @@
     right: 18px;
     bottom: 26px;
     width: 144px;
-    height: 114px;
-    padding: 5px;
+    height: 92px;
+    padding: 4px;
   }
-  .card-handwritten-text .card-line-1 { font-size: 1.10rem; }
-  .card-handwritten-text .card-line-2 { font-size: 0.95rem; }
-  .card-handwritten-text .card-line-3 { font-size: 1.08rem; }
-  .card-handwritten-text .card-line-4 { font-size: 1.02rem; }
   .cover-open-affordance {
     left: 14px;
     bottom: 16px;

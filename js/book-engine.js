@@ -188,14 +188,8 @@ export class BookEngine {
               <div class="cover-pocket-sleeve" aria-label="Tarjeta: cuaderno para mis hijos, Papá 1984">
                 <!-- Tarjeta rectangular de papel viejo amarillo cálido -->
                 <div class="cover-card-paper">
-                  <div class="card-handwritten-text">
-                    <span class="card-line card-line-1">cuaderno</span>
-                    <span class="card-line card-line-2">para</span>
-                    <span class="card-line card-line-3">mis hijos</span>
-                    <span class="card-line card-line-4">
-                      <span class="card-word-papa">P<span class="underlined-apa">apá<svg class="hand-drawn-underline" viewBox="0 0 38 6" preserveAspectRatio="none" aria-hidden="true"><path d="M 0.5,1.2 Q 18,2.2 37.5,3.8" stroke="#173866" stroke-width="1.2" stroke-linecap="round" fill="none" opacity="0.88" /></svg></span></span> <span class="card-year-1984">1984</span>
-                    </span>
-                  </div>
+                  <img src="assets/cover/card-handwriting-ink.png" alt="cuaderno para mis hijos, Papá 1984" class="card-original-handwriting-img" loading="eager">
+                  <span class="sr-only">cuaderno para mis hijos, Papá 1984</span>
                 </div>
                 <!-- Película plástica transparente superpuesta con reflejo y abertura superior -->
                 <div class="pocket-plastic-film" aria-hidden="true">
