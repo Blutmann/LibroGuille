@@ -58,8 +58,8 @@ export const BOOK_PAGES = [
     side: "cover",
     type: "cover-front",
     title: "Libro para mis hijos",
-    subtitle: "Cuaderno para mis hijos · Papá 1984",
-    transcription: "Tapa del libro: 'Cuaderno para mis hijos / Papá 1984', tarjeta manuscrita en tinta azul dentro de un bolsillo plástico transparente en el sector inferior derecho."
+    subtitle: "cuaderno para mis hijos · Papá 1984",
+    transcription: "Tapa del libro: 'cuaderno / para / mis hijos / Papá 1984', tarjeta en letra de imprenta manuscrita en tinta azul dentro de un bolsillo plástico transparente en el sector inferior derecho con subrayado artesanal en 'apá'."
   },
   // 1. Guarda anterior (reverso de tapa frontal)
   {

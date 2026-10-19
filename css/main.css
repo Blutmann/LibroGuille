@@ -251,7 +251,8 @@ html, body {
   position: relative;
   transform: translate3d(calc(var(--pan-x, 0px) + var(--closed-offset-x, 0px)), var(--pan-y, 0px), 0)
              rotateX(calc(var(--view-pitch, 18deg) + var(--rot-x, 0deg)))
-             rotateZ(var(--rot-z, 0deg));
+             rotateZ(var(--rot-z, 0deg))
+             scale(var(--book-scale, 1));
   transform-style: preserve-3d;
   transition: transform 0.14s ease-out;
   cursor: grab;
@@ -270,6 +271,91 @@ html, body {
 
 .book-pan-container.is-two-hands.is-dragging {
   cursor: grabbing;
+}
+
+/* Menú desplegable accesible para selección de inclinaciones */
+.tilt-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(18, 24, 35, 0.96);
+  border: 1px solid rgba(201, 158, 88, 0.45);
+  border-radius: 6px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(8px);
+  padding: 6px 0;
+  display: flex;
+  flex-direction: column;
+  min-width: 165px;
+  z-index: 100;
+  white-space: nowrap;
+}
+
+.tilt-dropdown-menu.is-hidden {
+  display: none !important;
+}
+
+.tilt-menu-item {
+  background: none;
+  border: none;
+  color: #dfceb1;
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  padding: 8px 14px;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.tilt-menu-item:hover,
+.tilt-menu-item:focus-visible {
+  background: rgba(201, 158, 88, 0.22);
+  color: #ecd59b;
+  outline: none;
+}
+
+.tilt-menu-item.is-selected {
+  color: var(--gold-foil);
+  font-weight: 600;
+  background: rgba(201, 158, 88, 0.12);
+}
+
+/* Grupo de control visual de tamaño/escala */
+.scale-control-group {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(18, 24, 35, 0.65);
+  border: 1px solid rgba(201, 158, 88, 0.35);
+  border-radius: 6px;
+  padding: 2px 4px;
+  gap: 4px;
+}
+
+.btn-scale-step {
+  padding: 3px 8px;
+  font-size: 0.85rem;
+  line-height: 1;
+  min-width: 26px;
+  border: none;
+  background: transparent;
+  color: #dfceb1;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.btn-scale-step:hover {
+  background: rgba(201, 158, 88, 0.2);
+  color: #fff;
+}
+
+.scale-label-display {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.76rem;
+  color: #ecd59b;
+  min-width: 40px;
+  text-align: center;
+  user-select: none;
 }
 
 /* Barra inferior sobria */

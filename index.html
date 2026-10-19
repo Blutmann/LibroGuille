@@ -6,10 +6,10 @@
   <title>Libro para mis hijos — Guillermo Bautista Harispe</title>
   <meta name="description" content="Prototipo web interactivo de preservación y digitalización del manuscrito familiar 'Libro para mis hijos' por Guillermo Bautista Harispe.">
   
-  <!-- Fuentes tipográficas: manuscrito auténtico 1984 -->
+  <!-- Fuentes tipográficas: manuscrito auténtico e imprenta 1984 -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Marck+Script&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Nanum+Pen+Script&family=Patrick+Hand&display=swap" rel="stylesheet">
 
   <!-- Estilos del proyecto -->
   <link rel="stylesheet" href="css/main.css">
@@ -198,9 +198,9 @@
         
         <div class="header-actions">
           <!-- Botón accesible para mover el libro sobre el escritorio (Desk Pan) -->
-          <button id="btnToggleDragMode" class="btn-header" aria-label="Mover libro sobre el escritorio" title="Mantené CTRL y arrastrá para mover el libro sobre el escritorio">
+          <button id="btnToggleDragMode" class="btn-header" aria-label="Mover libro sobre el escritorio" title="Mantené ALT y arrastrá para mover el libro sobre el escritorio">
             <span id="iconToggleDrag">✋</span>
-            <span id="textToggleDrag" class="btn-text-desktop">Mover libro (CTRL)</span>
+            <span id="textToggleDrag" class="btn-text-desktop">Mover libro (ALT)</span>
           </button>
 
           <!-- Botón para alternar abrir/cerrar el libro -->
@@ -215,11 +215,27 @@
             <span class="btn-text-desktop">Centrar</span>
           </button>
 
-          <!-- Botón para cambiar ángulo de inclinación / visualización (B3) -->
-          <button id="btnToggleTilt" class="btn-header btn-subtle" aria-label="Cambiar inclinación de observación" title="Inclinación visual (o Shift + Arrastrar vertical)">
-            <span>📐</span>
-            <span class="btn-text-desktop">Inclinación</span>
-          </button>
+          <!-- Botón y opciones predefinidas de inclinación (B3) -->
+          <div class="tilt-control-wrapper" style="position: relative; display: inline-flex;">
+            <button id="btnToggleTilt" class="btn-header btn-subtle" aria-label="Cambiar inclinación de observación" title="Inclinación visual (o Shift + Arrastrar)">
+              <span>📐</span>
+              <span id="textToggleTilt" class="btn-text-desktop">Inclinación</span>
+            </button>
+            <div id="tiltMenu" class="tilt-dropdown-menu is-hidden" role="menu" aria-label="Opciones de inclinación">
+              <button type="button" class="tilt-menu-item" data-pitch="0" role="menuitem">0° · Neutro</button>
+              <button type="button" class="tilt-menu-item" data-pitch="16" role="menuitem">16° · Lectura suave</button>
+              <button type="button" class="tilt-menu-item" data-pitch="32" role="menuitem">32° · Perspectiva</button>
+              <button type="button" class="tilt-menu-item" data-pitch="48" role="menuitem">48° · Profunda</button>
+              <button type="button" class="tilt-menu-item" data-pitch="-18" role="menuitem">-18° · Contrapicado</button>
+            </div>
+          </div>
+
+          <!-- Control visual de tamaño del libro (CTRL + arrastre) -->
+          <div class="scale-control-group" id="scaleControlGroup" title="Tamaño del libro (o Ctrl + Arrastrar horizontal)">
+            <button type="button" id="btnZoomOut" class="btn-header btn-subtle btn-scale-step" aria-label="Reducir tamaño del libro" title="Reducir tamaño">－</button>
+            <span id="scaleDisplayLabel" class="scale-label-display">100%</span>
+            <button type="button" id="btnZoomIn" class="btn-header btn-subtle btn-scale-step" aria-label="Aumentar tamaño del libro" title="Aumentar tamaño">＋</button>
+          </div>
 
           <!-- Transcripción accesible -->
           <button id="btnTranscription" class="btn-header" aria-label="Abrir transcripción accesible en texto plano">
@@ -229,10 +245,10 @@
         </div>
       </header>
 
-      <!-- Indicador de modo agarre con dos manos (CTRL activo) -->
+      <!-- Indicador de modo agarre con dos manos (ALT activo) -->
       <div id="twoHandBadge" class="two-hand-badge" aria-live="polite">
         <span class="badge-icon">👐</span>
-        <span>Sujeción estable con dos manos (CTRL)</span>
+        <span>Sujeción estable con dos manos (ALT)</span>
       </div>
 
       <!-- Escenario central: el libro físico sobre el escritorio -->
@@ -265,11 +281,13 @@
 
           <!-- Indicaciones discretas de interacción física -->
           <div class="desk-interaction-hints" id="deskHints">
-            <span class="hint-item"><span class="hint-icon">📖</span> Hojear: arrastrá las hojas libremente</span>
+            <span class="hint-item"><span class="hint-icon">📖</span> Hojear: arrastrá las hojas</span>
             <span class="hint-separator">·</span>
-            <span class="hint-item"><span class="hint-icon">✋</span> Mover libro: mantené CTRL</span>
+            <span class="hint-item"><span class="hint-icon">✋</span> Mover: Alt+arrastre</span>
             <span class="hint-separator">·</span>
-            <span class="hint-item"><span class="hint-icon">📐</span> Shift+arrastre: inclinación</span>
+            <span class="hint-item"><span class="hint-icon">📐</span> Inclinación: Shift+arrastre</span>
+            <span class="hint-separator">·</span>
+            <span class="hint-item"><span class="hint-icon">🔍</span> Tamaño: Ctrl+arrastre</span>
           </div>
 
         </div>

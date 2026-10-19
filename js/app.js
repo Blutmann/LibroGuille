@@ -19,6 +19,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnToggleBook = document.getElementById('btnToggleBook');
   const textToggleBook = document.getElementById('textToggleBook');
   const btnToggleTilt = document.getElementById('btnToggleTilt');
+  const tiltMenu = document.getElementById('tiltMenu');
+  const btnZoomIn = document.getElementById('btnZoomIn');
+  const btnZoomOut = document.getElementById('btnZoomOut');
+  const scaleDisplayLabel = document.getElementById('scaleDisplayLabel');
   const btnToggleDragMode = document.getElementById('btnToggleDragMode');
   const iconToggleDrag = document.getElementById('iconToggleDrag');
   const textToggleDrag = document.getElementById('textToggleDrag');
@@ -44,6 +48,24 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
           twoHandBadge.classList.remove('active');
         }
+      }
+    },
+    onScaleChange: (scale) => {
+      if (scaleDisplayLabel) {
+        scaleDisplayLabel.textContent = `${Math.round(scale * 100)}%`;
+      }
+    },
+    onPitchChange: (pitch) => {
+      if (tiltMenu) {
+        const items = tiltMenu.querySelectorAll('.tilt-menu-item');
+        items.forEach(item => {
+          const itemPitch = parseFloat(item.getAttribute('data-pitch'));
+          if (Math.abs(itemPitch - pitch) < 1) {
+            item.classList.add('is-selected');
+          } else {
+            item.classList.remove('is-selected');
+          }
+        });
       }
     },
     onDragModeChange: (isDragActive) => {
@@ -75,7 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Actualización del botón de Desplazamiento sobre la mesa (Desk Pan / CTRL)
+  // Actualización del botón de Desplazamiento sobre la mesa (Desk Pan / ALT)
   function updateDragModeUI(isDragActive) {
     if (!btnToggleDragMode) return;
     if (isDragActive) {
@@ -90,20 +112,24 @@ document.addEventListener('DOMContentLoaded', () => {
           <span class="hint-item"><span class="hint-icon">📖</span> Hojas: arrastrá esquinas libremente</span>
           <span class="hint-separator">·</span>
           <span class="hint-item"><span class="hint-icon">📐</span> Shift+arrastre: inclinación</span>
+          <span class="hint-separator">·</span>
+          <span class="hint-item"><span class="hint-icon">🔍</span> Ctrl+arrastre: tamaño</span>
         `;
       }
     } else {
       btnToggleDragMode.classList.remove('is-active');
-      btnToggleDragMode.setAttribute('title', 'Mantené CTRL y arrastrá para mover el libro sobre el escritorio');
+      btnToggleDragMode.setAttribute('title', 'Mantené ALT y arrastrá para mover el libro sobre el escritorio');
       if (iconToggleDrag) iconToggleDrag.textContent = '✋';
-      if (textToggleDrag) textToggleDrag.textContent = 'Mover libro (CTRL)';
+      if (textToggleDrag) textToggleDrag.textContent = 'Mover libro (ALT)';
       if (deskHints) {
         deskHints.innerHTML = `
           <span class="hint-item"><span class="hint-icon">📖</span> Hojear: arrastrá las hojas libremente</span>
           <span class="hint-separator">·</span>
-          <span class="hint-item"><span class="hint-icon">✋</span> Mover libro: mantené CTRL</span>
+          <span class="hint-item"><span class="hint-icon">✋</span> Mover: Alt+arrastre</span>
           <span class="hint-separator">·</span>
-          <span class="hint-item"><span class="hint-icon">📐</span> Shift+arrastre: inclinación</span>
+          <span class="hint-item"><span class="hint-icon">📐</span> Inclinación: Shift+arrastre</span>
+          <span class="hint-separator">·</span>
+          <span class="hint-item"><span class="hint-icon">🔍</span> Tamaño: Ctrl+arrastre</span>
         `;
       }
     }
@@ -183,10 +209,42 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Alternar inclinación visual (B3)
-  if (btnToggleTilt) {
-    btnToggleTilt.addEventListener('click', () => {
-      book.cyclePitch();
+  // Opciones de inclinación de perspectiva (B3)
+  if (btnToggleTilt && tiltMenu) {
+    btnToggleTilt.addEventListener('click', (e) => {
+      e.stopPropagation();
+      tiltMenu.classList.toggle('is-hidden');
+    });
+
+    const tiltItems = tiltMenu.querySelectorAll('.tilt-menu-item');
+    tiltItems.forEach(item => {
+      item.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const pitch = parseFloat(item.getAttribute('data-pitch'));
+        book.setPresetPitch(pitch);
+        tiltMenu.classList.add('is-hidden');
+      });
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!tiltMenu.classList.contains('is-hidden')) {
+        if (!tiltMenu.contains(e.target) && !btnToggleTilt.contains(e.target)) {
+          tiltMenu.classList.add('is-hidden');
+        }
+      }
+    });
+  }
+
+  // Controles de zoom / escala del libro
+  if (btnZoomIn) {
+    btnZoomIn.addEventListener('click', () => {
+      book.zoomIn(0.1);
+    });
+  }
+
+  if (btnZoomOut) {
+    btnZoomOut.addEventListener('click', () => {
+      book.zoomOut(0.1);
     });
   }
 
@@ -197,6 +255,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (e.key === 'Escape') {
+      if (tiltMenu && !tiltMenu.classList.contains('is-hidden')) {
+        tiltMenu.classList.add('is-hidden');
+        return;
+      }
       if (modalTranscription.classList.contains('active')) {
         closeTranscriptionModal();
         return;

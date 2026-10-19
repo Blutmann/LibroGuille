@@ -336,7 +336,7 @@
   opacity: 0.9;
 }
 
-/* Texto manuscrito íntimo de 4 líneas en tinta azul envejecida */
+/* Texto de la tarjeta: letra de imprenta manuscrita (referencia a la birome de Guillermo) */
 .card-handwritten-text {
   width: 100%;
   display: flex;
@@ -344,12 +344,12 @@
   justify-content: center;
   align-items: center;
   text-align: center;
-  font-family: "Marck Script", "Caveat", "Segoe Script", "Bradley Hand", cursive;
-  line-height: 1.18;
-  font-weight: 500;
-  color: #173866; /* Tinta azul vintage de pluma/bolígrafo envejecida */
-  letter-spacing: 0.025em;
-  text-shadow: 0 0 0.4px rgba(23, 56, 102, 0.45);
+  font-family: 'Patrick Hand', 'Nanum Pen Script', 'Segoe Print', cursive, sans-serif;
+  line-height: 1.15;
+  font-weight: 400;
+  color: #173866; /* Tinta azul vintage de birome */
+  letter-spacing: 0.03em;
+  text-shadow: 0 0 0.4px rgba(23, 56, 102, 0.4);
   position: relative;
   z-index: 2;
   user-select: none;
@@ -360,25 +360,51 @@
 }
 
 .card-handwritten-text .card-line-1 {
-  font-size: 1.34rem;
-  letter-spacing: 0.02em;
+  font-size: 1.30rem;
+  letter-spacing: 0.025em;
 }
 
 .card-handwritten-text .card-line-2 {
-  font-size: 1.14rem;
+  font-size: 1.18rem;
   margin-top: -1px;
 }
 
 .card-handwritten-text .card-line-3 {
-  font-size: 1.30rem;
+  font-size: 1.28rem;
   margin-top: -1px;
 }
 
 .card-handwritten-text .card-line-4 {
-  font-size: 1.22rem;
-  margin-top: 4px;
-  color: #1a3c6e;
+  font-size: 1.24rem;
+  margin-top: 3px;
+  color: #183a6b;
   letter-spacing: 0.035em;
+  display: inline-flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 6px;
+}
+
+.card-word-papa {
+  position: relative;
+  display: inline-flex;
+  align-items: baseline;
+}
+
+.underlined-apa {
+  position: relative;
+  display: inline-block;
+}
+
+/* Subrayado artesanal fino y discreto debajo de "apá", con suave pendiente descendente */
+.hand-drawn-underline {
+  position: absolute;
+  left: 0;
+  bottom: -2.5px;
+  width: 100%;
+  height: 5px;
+  overflow: visible;
+  pointer-events: none;
 }
 
 /* Película de plástico transparente superpuesta con reflejo y ranura superior */

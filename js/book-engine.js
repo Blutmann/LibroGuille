@@ -29,10 +29,20 @@ export class BookEngine {
     this.isAnimating = false;
     this.isMobile = this.checkIfMobile();
 
-    // Inclinación visual de la cámara (-55° a +55°, permitiendo vista casi vertical/frontal para lectura)
-    this.viewPitch = 15;
-    this.pitchLevels = [0, 15, 30, 48]; // 0° = frontal/vertical, 15° = lectura cómoda, 30° = plano, 48° = cenital
+    // Inclinación visual de la cámara (-70° a +70°)
+    this.viewPitch = 16;
+    this.pitchPresets = [
+      { label: '0° · Neutro', pitch: 0 },
+      { label: '16° · Lectura suave', pitch: 16 },
+      { label: '32° · Perspectiva', pitch: 32 },
+      { label: '48° · Profunda', pitch: 48 },
+      { label: '-18° · Contrapicado', pitch: -18 }
+    ];
     this.pitchIndex = 1;
+
+    // Escala del libro (0.65 a 1.75)
+    this.bookScale = 1.0;
+    this.gestureStartScale = 1.0;
 
     // Estado del desplazamiento del libro sobre el escritorio (Desk Pan)
     this.panX = 0;
@@ -42,7 +52,7 @@ export class BookEngine {
     this.isTwoHandMode = false;
 
     // Máquina de estados de gestos unificada con Target Locking
-    this.activeGesture = null; // 'COVER' | 'PAGE_NEXT' | 'PAGE_PREV' | 'BOOK_PAN' | 'VIEW_PITCH' | null
+    this.activeGesture = null; // 'COVER' | 'PAGE_NEXT' | 'PAGE_PREV' | 'BOOK_PAN' | 'VIEW_PITCH' | 'BOOK_SCALE' | null
     this.gestureStartPointerX = 0;
     this.gestureStartPointerY = 0;
     this.gestureStartCoverAngle = 0;
@@ -75,6 +85,7 @@ export class BookEngine {
     this.onPageChange = options.onPageChange || (() => {});
     this.onTwoHandChange = options.onTwoHandChange || (() => {});
     this.onPitchChange = options.onPitchChange || (() => {});
+    this.onScaleChange = options.onScaleChange || (() => {});
     this.onDragModeChange = options.onDragModeChange || (() => {});
 
     this.init();
@@ -170,18 +181,20 @@ export class BookEngine {
         <!-- Tapa frontal interactiva con apertura variable (0° a 180°) -->
         <div class="book-front-cover" id="frontCover" role="button" aria-label="Tapa frontal del libro">
           <div class="cover-face front-face">
-            <div class="book-cover-view" aria-label="Tapa del libro: Cuaderno para mis hijos, Papá 1984">
-              <span class="sr-only">Tapa del libro: Cuaderno para mis hijos, Papá 1984</span>
+            <div class="book-cover-view" aria-label="Tapa del libro: cuaderno para mis hijos, Papá 1984">
+              <span class="sr-only">Tapa del libro: cuaderno para mis hijos, Papá 1984</span>
 
               <!-- Bolsillo de plástico transparente adherido en el sector inferior derecho -->
-              <div class="cover-pocket-sleeve" aria-label="Tarjeta manuscrita: Cuaderno para mis hijos, Papá 1984">
+              <div class="cover-pocket-sleeve" aria-label="Tarjeta: cuaderno para mis hijos, Papá 1984">
                 <!-- Tarjeta rectangular de papel viejo amarillo cálido -->
                 <div class="cover-card-paper">
                   <div class="card-handwritten-text">
-                    <span class="card-line card-line-1">Cuaderno</span>
+                    <span class="card-line card-line-1">cuaderno</span>
                     <span class="card-line card-line-2">para</span>
                     <span class="card-line card-line-3">mis hijos</span>
-                    <span class="card-line card-line-4">Papá 1984</span>
+                    <span class="card-line card-line-4">
+                      <span class="card-word-papa">P<span class="underlined-apa">apá<svg class="hand-drawn-underline" viewBox="0 0 38 6" preserveAspectRatio="none" aria-hidden="true"><path d="M 0.5,1.2 Q 18,2.2 37.5,3.8" stroke="#173866" stroke-width="1.2" stroke-linecap="round" fill="none" opacity="0.88" /></svg></span></span> <span class="card-year-1984">1984</span>
+                    </span>
                   </div>
                 </div>
                 <!-- Película plástica transparente superpuesta con reflejo y abertura superior -->
@@ -455,26 +468,57 @@ export class BookEngine {
   // ==========================================================================
 
   setPitch(pitch) {
-    this.viewPitch = Math.max(-55, Math.min(55, pitch));
+    this.viewPitch = Math.max(-70, Math.min(70, pitch));
     this.panContainer.style.setProperty('--view-pitch', `${this.viewPitch.toFixed(1)}deg`);
     this.onPitchChange(this.viewPitch);
   }
 
-  cyclePitch() {
-    this.pitchIndex = (this.pitchIndex + 1) % this.pitchLevels.length;
-    const nextPitch = this.pitchLevels[this.pitchIndex];
+  setPresetPitch(pitch) {
     this.panContainer.style.transition = 'transform 0.4s cubic-bezier(0.2, 0.85, 0.35, 1)';
-    this.setPitch(nextPitch);
+    this.setPitch(pitch);
+    const foundIndex = this.pitchPresets.findIndex(p => Math.abs(p.pitch - pitch) < 0.5);
+    if (foundIndex !== -1) {
+      this.pitchIndex = foundIndex;
+    }
     setTimeout(() => {
       this.panContainer.style.transition = '';
     }, 420);
   }
 
+  cyclePitch() {
+    this.pitchIndex = (this.pitchIndex + 1) % this.pitchPresets.length;
+    const nextPitch = this.pitchPresets[this.pitchIndex].pitch;
+    this.setPresetPitch(nextPitch);
+  }
+
   // ==========================================================================
-  // A1 y A3. GESTIÓN DE PUNTERO Y SEPARACIÓN DEFINITIVA DE GESTOS
-  // 1. Pasar páginas y abrir tapa: SIEMPRE DISPONIBLE por arrastre o clic.
-  // 2. Mover libro sobre la mesa: SÓLO con CTRL o modo Desk Pan.
-  // 3. Arrastre en la mesa sin CTRL: NO mueve el libro.
+  // ESCALA Y TAMAÑO DEL LIBRO (CTRL + arrastre horizontal)
+  // ==========================================================================
+
+  setScale(scale) {
+    this.bookScale = Math.max(0.65, Math.min(1.75, scale));
+    this.panContainer.style.setProperty('--book-scale', this.bookScale.toFixed(3));
+    this.onScaleChange(this.bookScale);
+  }
+
+  zoomIn(step = 0.1) {
+    this.setScale(Math.round((this.bookScale + step) * 100) / 100);
+  }
+
+  zoomOut(step = 0.1) {
+    this.setScale(Math.round((this.bookScale - step) * 100) / 100);
+  }
+
+  resetScale() {
+    this.setScale(1.0);
+  }
+
+  // ==========================================================================
+  // GESTIÓN DE PUNTERO Y ASIGNACIÓN DEFINITIVA DE CONTROLES
+  // 1. Sin teclas: Pasar páginas y abrir tapa por arrastre o clic.
+  // 2. ALT + arrastrar: Mover libro en el espacio (Desk Pan).
+  // 3. SHIFT + arrastrar: Inclinar el libro (Pitch/Tilt).
+  // 4. CTRL + arrastrar horizontal: Cambiar tamaño del libro (Zoom).
   // ==========================================================================
 
   bindUnifiedGestureEvents() {
@@ -489,17 +533,24 @@ export class BookEngine {
         return;
       }
 
-      // GESTO 1: Inclinación de vista con SHIFT (B3)
-      if (e.shiftKey) {
+      // MODIFICADORES MUTUAMENTE EXCLUYENTES
+      // GESTO 1: Cambio de escala / tamaño con CTRL horizontal
+      if (e.ctrlKey && !e.shiftKey && !e.altKey) {
+        e.preventDefault();
+        this.startScaleGesture(e);
+        return;
+      }
+
+      // GESTO 2: Inclinación de perspectiva (Pitch / Tilt) con SHIFT
+      if (e.shiftKey && !e.altKey && !e.ctrlKey) {
         e.preventDefault();
         this.gestureStartPointerY = e.clientY;
         this.startPitchGesture(e);
         return;
       }
 
-      // GESTO 2: Desplazamiento del libro sobre la mesa (Desk Pan)
-      // REGLA A3: SÓLO con CTRL presionado o si está activo el modo Desk Pan accesible
-      if (e.ctrlKey || this.isDeskPanMode) {
+      // GESTO 3: Desplazamiento del libro en el espacio (Desk Pan) con ALT o modo Desk Pan activo
+      if ((e.altKey || this.isDeskPanMode) && !e.shiftKey && !e.ctrlKey) {
         e.preventDefault();
         this.gestureStartPointerX = e.clientX;
         this.gestureStartPointerY = e.clientY;
@@ -507,8 +558,8 @@ export class BookEngine {
         return;
       }
 
-      // GESTO 3: Interacción directa con el libro físico (Tapa o Páginas)
-      // Si el usuario toca el escritorio fuera del libro SIN CTRL: NO MOVER EL LIBRO
+      // GESTO 4: Interacción directa con el libro físico (Tapa o Páginas)
+      // Si el usuario toca el escritorio fuera del libro SIN modificadores: NO MOVER EL LIBRO
       const touchedBook = e.target.closest('#bookContainer');
       if (!touchedBook) {
         return; // Clic o arrastre neutro sobre la mesa no desplaza el libro
@@ -561,6 +612,35 @@ export class BookEngine {
     };
 
     target.addEventListener('pointerdown', handlePointerDown);
+  }
+
+  // --- GESTO: Escala / Tamaño del libro con CTRL horizontal ---
+  startScaleGesture(e) {
+    if (this.isMobile) return;
+    this.activeGesture = 'BOOK_SCALE';
+    this.gestureStartScale = this.bookScale;
+    this.gestureStartPointerX = e.clientX;
+    try { this.panContainer.setPointerCapture(e.pointerId); } catch (_) {}
+
+    const handlePointerMove = (moveEvt) => {
+      if (this.activeGesture !== 'BOOK_SCALE') return;
+      // Requisito: arrastrar a la izquierda aumenta el tamaño; arrastrar a la derecha lo reduce
+      const deltaX = moveEvt.clientX - this.gestureStartPointerX;
+      const factor = 0.0035;
+      const newScale = Math.max(0.65, Math.min(1.75, this.gestureStartScale - (deltaX * factor)));
+      this.setScale(newScale);
+    };
+
+    const handlePointerUp = (upEvt) => {
+      if (this.activeGesture !== 'BOOK_SCALE') return;
+      this.activeGesture = null;
+      try { this.panContainer.releasePointerCapture(upEvt.pointerId); } catch (_) {}
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('pointerup', handlePointerUp);
+    };
+
+    window.addEventListener('pointermove', handlePointerMove);
+    window.addEventListener('pointerup', handlePointerUp);
   }
 
   // --- GESTO: Inclinación de la vista con SHIFT (B3) ---
@@ -828,7 +908,7 @@ export class BookEngine {
   startBookPanGesture(e, isTwoHand) {
     if (this.isMobile) return;
     this.activeGesture = 'BOOK_PAN';
-    this.isTwoHandMode = isTwoHand || e.ctrlKey;
+    this.isTwoHandMode = isTwoHand || e.altKey;
     this.panContainer.classList.add('is-dragging');
 
     this.gestureStartPanX = this.panX;
@@ -893,7 +973,8 @@ export class BookEngine {
     this.panY = 0;
     this.rotX = 0;
     this.rotZ = 0;
-    this.setPitch(18);
+    this.setPitch(16);
+    this.setScale(1.0);
     this.applyPanTransform();
 
     setTimeout(() => {
@@ -902,18 +983,18 @@ export class BookEngine {
   }
 
   // ==========================================================================
-  // TECLADO MODIFICADOR (CTRL)
+  // TECLADO MODIFICADOR (ALT)
   // ==========================================================================
 
   bindKeyboardModifiers() {
     window.addEventListener('keydown', (e) => {
-      if (e.key === 'Control') {
+      if (e.key === 'Alt') {
         this.setTwoHandMode(true);
       }
     });
 
     window.addEventListener('keyup', (e) => {
-      if (e.key === 'Control') {
+      if (e.key === 'Alt') {
         this.setTwoHandMode(false);
       }
     });
@@ -965,161 +1046,177 @@ export class BookEngine {
 
   // ==========================================================================
   // NAVEGACIÓN PROGRAMÁTICA (BOTONES / TECLAS DE FLECHA)
+  // Animación física realista de hoja en vuelo 3D (elevación translateZ, curvatura cilíndrica y sombras)
   // ==========================================================================
 
   nextPage() {
-    if (this.isAnimating) return;
-
-    if (this.coverAngle < 90) {
-      this.openBook();
-      return;
-    }
-
-    const maxIndex = this.pages.length - 2;
-    if (this.currentIndex >= maxIndex) return;
-
-    if (this.isMobile) {
-      this.currentIndex = Math.min(maxIndex, this.currentIndex + 1);
-      this.renderCurrentSpread();
-      this.updateDynamicThickness();
-      this.notifyChange();
-      return;
-    }
-
-    if (this.prefersReducedMotion()) {
-      this.currentIndex = Math.min(maxIndex, this.currentIndex + 2);
-      this.renderCurrentSpread();
-      this.updateDynamicThickness();
-      this.notifyChange();
-      return;
-    }
-
-    this.isAnimating = true;
-    const oldRightData = this.getVisiblePages().right;
-    const nextLeftIndex = this.currentIndex + 2;
-    const newLeftData = this.pages[nextLeftIndex];
-
-    // Revelar la página siguiente que quedará debajo en el hemisferio derecho
-    if (this.rightContentEl && this.pages[nextLeftIndex + 1]) {
-      this.rightContentEl.innerHTML = this.renderPageContent(this.pages[nextLeftIndex + 1]);
-    }
-
-    const leaf = document.createElement('div');
-    leaf.className = 'flipping-leaf flip-right-to-left is-finishing-turn';
-    leaf.innerHTML = `
-      <div class="leaf-face front">
-        <div class="page-inner-content">${this.renderPageContent(oldRightData)}</div>
-        <div class="leaf-shadow-overlay"></div>
-      </div>
-      <div class="leaf-face back">
-        <div class="page-inner-content">${this.renderPageContent(newLeftData)}</div>
-        <div class="leaf-shadow-overlay"></div>
-      </div>
-    `;
-
-    this.bookBodyEl.appendChild(leaf);
-    this.activeLeafEl = leaf;
-    void leaf.offsetWidth; // Reflow
-
-    leaf.style.transform = 'rotateY(-180deg) translateZ(0px)';
-    leaf.style.setProperty('--leaf-crest', '90%');
-    leaf.style.setProperty('--leaf-shadow-opacity', '0');
-
-    let finished = false;
-    const handleAnimEnd = () => {
-      if (finished) return;
-      finished = true;
-      leaf.removeEventListener('transitionend', handleAnimEnd);
-      leaf.remove();
-      this.activeLeafEl = null;
-      this.currentIndex = Math.min(maxIndex, this.currentIndex + 2);
-      this.renderCurrentSpread();
-      this.updateDynamicThickness();
-      this.isAnimating = false;
-      this.notifyChange();
-    };
-
-    leaf.addEventListener('transitionend', handleAnimEnd);
-    setTimeout(handleAnimEnd, 780);
+    this.animatePageTurn('next');
   }
 
   prevPage() {
+    this.animatePageTurn('prev');
+  }
+
+  animatePageTurn(direction) {
     if (this.isAnimating) return;
 
-    if (this.coverAngle < 90) return;
+    if (direction === 'next') {
+      if (this.coverAngle < 90) {
+        this.openBook();
+        return;
+      }
+      const maxIndex = this.pages.length - 2;
+      if (this.currentIndex >= maxIndex) return;
 
-    if (this.isMobile) {
-      if (this.currentIndex <= 2) {
+      if (this.isMobile) {
+        this.currentIndex = Math.min(maxIndex, this.currentIndex + 1);
+        this.renderCurrentSpread();
+        this.updateDynamicThickness();
+        this.notifyChange();
+        return;
+      }
+
+      this.isAnimating = true;
+      const oldRightData = this.getVisiblePages().right;
+      const nextLeftIndex = this.currentIndex + 2;
+      const newLeftData = this.pages[nextLeftIndex];
+
+      // Revelar la página siguiente que quedará debajo en el hemisferio derecho
+      if (this.rightContentEl && this.pages[nextLeftIndex + 1]) {
+        this.rightContentEl.innerHTML = this.renderPageContent(this.pages[nextLeftIndex + 1]);
+      }
+
+      const leaf = document.createElement('div');
+      leaf.className = 'flipping-leaf flip-right-to-left';
+      leaf.style.transition = 'none';
+      leaf.innerHTML = `
+        <div class="leaf-face front">
+          <div class="page-inner-content">${this.renderPageContent(oldRightData)}</div>
+          <div class="leaf-shadow-overlay"></div>
+        </div>
+        <div class="leaf-face back">
+          <div class="page-inner-content">${this.renderPageContent(newLeftData)}</div>
+          <div class="leaf-shadow-overlay"></div>
+        </div>
+      `;
+
+      this.bookBodyEl.appendChild(leaf);
+      this.activeLeafEl = leaf;
+
+      const duration = 720;
+      const startTime = performance.now();
+
+      const step = (now) => {
+        const elapsed = now - startTime;
+        const t = Math.min(1, elapsed / duration);
+        // Easing suave natural (ease-in-out cúbico)
+        const ease = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+        const angle = -180 * ease;
+        const sinP = Math.sin(ease * Math.PI);
+        const liftZ = sinP * 32; // Elevación vertical en el cenit de la curva
+        const crestPos = (ease * 80 + 10).toFixed(0);
+        const shadowOpacity = (sinP * 0.82).toFixed(2);
+
+        leaf.style.transform = `rotateY(${angle.toFixed(1)}deg) translateZ(${liftZ.toFixed(1)}px)`;
+        leaf.style.setProperty('--leaf-crest', `${crestPos}%`);
+        leaf.style.setProperty('--leaf-shadow-opacity', shadowOpacity);
+
+        if (t < 1) {
+          requestAnimationFrame(step);
+        } else {
+          leaf.remove();
+          this.activeLeafEl = null;
+          this.currentIndex = Math.min(maxIndex, this.currentIndex + 2);
+          this.renderCurrentSpread();
+          this.updateDynamicThickness();
+          this.isAnimating = false;
+          this.notifyChange();
+        }
+      };
+
+      requestAnimationFrame(step);
+    } else {
+      // Dirección: retroceso ('prev')
+      if (this.coverAngle < 90) return;
+
+      if (this.isMobile) {
+        if (this.currentIndex <= 2) {
+          this.closeBook();
+          return;
+        }
+        this.currentIndex = Math.max(2, this.currentIndex - 1);
+        this.renderCurrentSpread();
+        this.updateDynamicThickness();
+        this.notifyChange();
+        return;
+      }
+
+      if (this.currentIndex <= 1) {
         this.closeBook();
         return;
       }
-      this.currentIndex = Math.max(2, this.currentIndex - 1);
-      this.renderCurrentSpread();
-      this.updateDynamicThickness();
-      this.notifyChange();
-      return;
+
+      this.isAnimating = true;
+      const currentLeftData = this.getVisiblePages().left;
+      const targetIndex = Math.max(1, this.currentIndex - 2);
+      const prevRightData = this.pages[targetIndex + 1];
+
+      // Revelar la página previa que quedará debajo en el hemisferio izquierdo
+      if (this.leftContentEl && this.pages[targetIndex]) {
+        this.leftContentEl.innerHTML = this.renderPageContent(this.pages[targetIndex]);
+      }
+
+      const leaf = document.createElement('div');
+      leaf.className = 'flipping-leaf flip-left-to-right';
+      leaf.style.transition = 'none';
+      leaf.innerHTML = `
+        <div class="leaf-face front">
+          <div class="page-inner-content">${this.renderPageContent(currentLeftData)}</div>
+          <div class="leaf-shadow-overlay"></div>
+        </div>
+        <div class="leaf-face back">
+          <div class="page-inner-content">${this.renderPageContent(prevRightData)}</div>
+          <div class="leaf-shadow-overlay"></div>
+        </div>
+      `;
+
+      this.bookBodyEl.appendChild(leaf);
+      this.activeLeafEl = leaf;
+
+      const duration = 720;
+      const startTime = performance.now();
+
+      const step = (now) => {
+        const elapsed = now - startTime;
+        const t = Math.min(1, elapsed / duration);
+        const ease = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+        const angle = 180 * ease;
+        const sinP = Math.sin(ease * Math.PI);
+        const liftZ = sinP * 32;
+        const crestPos = ((1 - ease) * 80 + 10).toFixed(0);
+        const shadowOpacity = (sinP * 0.82).toFixed(2);
+
+        leaf.style.transform = `rotateY(${angle.toFixed(1)}deg) translateZ(${liftZ.toFixed(1)}px)`;
+        leaf.style.setProperty('--leaf-crest', `${crestPos}%`);
+        leaf.style.setProperty('--leaf-shadow-opacity', shadowOpacity);
+
+        if (t < 1) {
+          requestAnimationFrame(step);
+        } else {
+          leaf.remove();
+          this.activeLeafEl = null;
+          this.currentIndex = targetIndex;
+          this.renderCurrentSpread();
+          this.updateDynamicThickness();
+          this.isAnimating = false;
+          this.notifyChange();
+        }
+      };
+
+      requestAnimationFrame(step);
     }
-
-    if (this.currentIndex <= 1) {
-      this.closeBook();
-      return;
-    }
-
-    if (this.prefersReducedMotion()) {
-      this.currentIndex = Math.max(1, this.currentIndex - 2);
-      this.renderCurrentSpread();
-      this.updateDynamicThickness();
-      this.notifyChange();
-      return;
-    }
-
-    this.isAnimating = true;
-    const currentLeftData = this.getVisiblePages().left;
-    const targetIndex = Math.max(1, this.currentIndex - 2);
-    const prevRightData = this.pages[targetIndex + 1];
-
-    // Revelar la página previa que quedará debajo en el hemisferio izquierdo
-    if (this.leftContentEl && this.pages[targetIndex]) {
-      this.leftContentEl.innerHTML = this.renderPageContent(this.pages[targetIndex]);
-    }
-
-    const leaf = document.createElement('div');
-    leaf.className = 'flipping-leaf flip-left-to-right is-finishing-turn';
-    leaf.innerHTML = `
-      <div class="leaf-face front">
-        <div class="page-inner-content">${this.renderPageContent(currentLeftData)}</div>
-        <div class="leaf-shadow-overlay"></div>
-      </div>
-      <div class="leaf-face back">
-        <div class="page-inner-content">${this.renderPageContent(prevRightData)}</div>
-        <div class="leaf-shadow-overlay"></div>
-      </div>
-    `;
-
-    this.bookBodyEl.appendChild(leaf);
-    this.activeLeafEl = leaf;
-    void leaf.offsetWidth; // Reflow
-
-    leaf.style.transform = 'rotateY(180deg) translateZ(0px)';
-    leaf.style.setProperty('--leaf-crest', '10%');
-    leaf.style.setProperty('--leaf-shadow-opacity', '0');
-
-    let finished = false;
-    const handleAnimEnd = () => {
-      if (finished) return;
-      finished = true;
-      leaf.removeEventListener('transitionend', handleAnimEnd);
-      leaf.remove();
-      this.activeLeafEl = null;
-      this.currentIndex = targetIndex;
-      this.renderCurrentSpread();
-      this.updateDynamicThickness();
-      this.isAnimating = false;
-      this.notifyChange();
-    };
-
-    leaf.addEventListener('transitionend', handleAnimEnd);
-    setTimeout(handleAnimEnd, 780);
   }
 
   // ==========================================================================
