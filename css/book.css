@@ -741,8 +741,8 @@
   position: absolute;
   top: 10px;
   left: 14px;
-  width: 49%;
-  max-width: 204px;
+  width: 42%;
+  max-width: 172px;
   z-index: 2;
   transform: rotate(-0.85deg);
   transform-origin: 10% 20%;
@@ -755,7 +755,7 @@
 
 .date-typewritten-1951 {
   width: 78%;
-  max-width: 132px;
+  max-width: 130px;
   height: auto;
   margin-bottom: 6px;
   margin-left: 2px;
@@ -766,12 +766,13 @@
 }
 
 /* 1959: Sector medio-inferior derecho en cascada diagonal con contra-inclinación orgánica */
+/* Con separación horizontal respecto al primer recorte para destacar que son piezas independientes */
 .item-bastianini {
   position: absolute;
-  top: 112px;
+  top: 116px;
   right: 14px;
-  width: 45.5%;
-  max-width: 184px;
+  width: 39.5%;
+  max-width: 158px;
   z-index: 3;
   transform: rotate(1.15deg);
   transform-origin: 90% 20%;
@@ -783,11 +784,11 @@
 }
 
 .date-handwritten-1959 {
-  width: 108%;
-  max-width: 184px;
+  width: 100%;
+  max-width: 160px;
   height: auto;
   margin-top: 8px;
-  margin-left: -5px;
+  margin-left: 0;
   mix-blend-mode: multiply;
   transform: rotate(0.35deg);
   user-select: none;
@@ -827,13 +828,14 @@
   pointer-events: auto;
 }
 
-/* Pie de hoja discreto con numeración editorial (ej: 01/35) */
+/* Pie de hoja discreto con numeración editorial alineada a la derecha (ej: 01/35) */
 .sheet-footer {
   width: 100%;
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
   align-items: center;
-  padding: 8px 0 2px 0;
+  padding: 6px 20px 4px 0;
+  box-sizing: border-box;
   flex-shrink: 0;
   pointer-events: none;
   user-select: none;
@@ -847,6 +849,7 @@
   opacity: 0.75;
   font-variant-numeric: tabular-nums;
   text-shadow: 0 1px 1px rgba(255, 255, 255, 0.6);
+  text-align: right;
 }
 
 .page-body-scrollable {
@@ -1229,20 +1232,25 @@
 
   /* Adaptación de composición Hoja 01 en pantallas móviles */
   .sheet-scrapbook-composition {
-    gap: 10px;
-    padding: 2px 0;
+    padding: 4px 6px;
   }
-  .col-sarmiento {
-    width: 52%;
+  .item-sarmiento {
+    width: 44%;
+    left: 8px;
+    top: 6px;
   }
-  .col-bastianini {
-    width: 46%;
-    margin-top: 8px;
+  .item-bastianini {
+    width: 41%;
+    right: 8px;
+    top: 96px;
   }
   .date-typewritten-1951 {
     margin-bottom: 4px;
   }
   .date-handwritten-1959 {
     margin-top: 6px;
+  }
+  .sheet-footer {
+    padding: 4px 12px 2px 0;
   }
 }
