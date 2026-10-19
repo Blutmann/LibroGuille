@@ -42,8 +42,8 @@ export const BOOK_PAGES = [
     side: "cover",
     type: "cover-front",
     title: "Libro para mis hijos",
-    subtitle: "Guillermo Bautista Harispe",
-    transcription: "Tapa del libro: 'Libro para mis hijos', escrito por Guillermo Bautista Harispe."
+    subtitle: "Cuaderno para mis hijos · Papá 1984",
+    transcription: "Tapa del libro: 'Cuaderno para mis hijos / Papá 1984', tarjeta manuscrita en tinta azul dentro de un bolsillo plástico transparente en el sector inferior derecho."
   },
   // 1. Guarda anterior (reverso de tapa frontal)
   {

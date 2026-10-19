@@ -170,8 +170,27 @@ export class BookEngine {
         <!-- Tapa frontal interactiva con apertura variable (0° a 180°) -->
         <div class="book-front-cover" id="frontCover" role="button" aria-label="Tapa frontal del libro">
           <div class="cover-face front-face">
-            <div class="book-cover-view" aria-label="Libro para mis hijos — Guillermo Bautista Harispe">
-              <span class="sr-only">Libro para mis hijos — Guillermo Bautista Harispe</span>
+            <div class="book-cover-view" aria-label="Tapa del libro: Cuaderno para mis hijos, Papá 1984">
+              <span class="sr-only">Tapa del libro: Cuaderno para mis hijos, Papá 1984</span>
+
+              <!-- Bolsillo de plástico transparente adherido en el sector inferior derecho -->
+              <div class="cover-pocket-sleeve" aria-label="Tarjeta manuscrita: Cuaderno para mis hijos, Papá 1984">
+                <!-- Tarjeta rectangular de papel viejo amarillo cálido -->
+                <div class="cover-card-paper">
+                  <div class="card-handwritten-text">
+                    <span class="card-line card-line-1">Cuaderno</span>
+                    <span class="card-line card-line-2">para</span>
+                    <span class="card-line card-line-3">mis hijos</span>
+                    <span class="card-line card-line-4">Papá 1984</span>
+                  </div>
+                </div>
+                <!-- Película plástica transparente superpuesta con reflejo y abertura superior -->
+                <div class="pocket-plastic-film" aria-hidden="true">
+                  <div class="pocket-slit-opening"></div>
+                  <div class="pocket-sheen"></div>
+                </div>
+              </div>
+
               <div class="cover-open-affordance">
                 <span>📖 Arrastrá para abrir el libro</span>
               </div>
