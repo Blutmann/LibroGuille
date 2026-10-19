@@ -18,12 +18,28 @@ export const BOOK_METADATA = {
   totalPages: TOTAL_SHEETS
 };
 
-// Generación de las 35 hojas vacías con numeración editorial fija (01/35 a 35/35)
+// Generación de las 35 hojas con numeración editorial fija (01/35 a 35/35)
+// La Hoja 01 contiene los recortes originales de 1951 y 1959; las hojas 02 a 35 quedan vacías para futuro contenido.
 const emptySheets = Array.from({ length: TOTAL_SHEETS }, (_, idx) => {
   const sheetNum = idx + 1;
   const formattedNumber = `${String(sheetNum).padStart(2, '0')}/${TOTAL_SHEETS}`;
+  
+  if (sheetNum === 1) {
+    return {
+      id: idx + 2,
+      sheetNumber: 1,
+      sheetLabel: formattedNumber,
+      type: "sheet",
+      side: "recto",
+      title: "Primeros reconocimientos literarios (1951 · 1959)",
+      subtitle: "Biblioteca Popular Sarmiento y Certamen René Bastianini",
+      image: "assets/sheet-01/sheet-01-composite.png",
+      transcription: "Hoja 01/35: Primer recorte: 'sept. 1.951' - Biblioteca Popular Sarmiento :: Acto Literario. Segundo premio: 'Romance al tiempo mago', composición del alumno de la Escuela de Comercio, señor Guillermo B. Harispe Macchiavello. Segundo recorte: 'EL VI CERTAMEN RENÉ BASTIANINI 1959'. Jurado constituído por Jorge Luis Borges, Nicolás Cócaro y Carlos O. Bastianini. Mención de honor: 'Tierra en la lejanía', de Guillermo B. Harispe. Fecha manuscrita en birome azul: 'LA NACIÓN 2/3 Dbre/59'."
+    };
+  }
+
   return {
-    id: idx + 2, // Índices 2 a 36 en el pliego
+    id: idx + 2, // Índices 3 a 36 en el pliego
     sheetNumber: sheetNum,
     sheetLabel: formattedNumber,
     type: "sheet",

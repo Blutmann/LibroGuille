@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Pruebas de Composición — Hoja 01/35</title>
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/book.css">
+  <style>
+    body {
+      background: #111622;
+      color: #fff;
+      font-family: sans-serif;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 50px;
+    }
+    .test-card {
+      background: #182030;
+      padding: 24px;
+      border-radius: 8px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    .test-title {
+      font-size: 1.15rem;
+      margin-bottom: 15px;
+      color: #ecd59b;
+      font-family: serif;
+    }
+    .mock-page {
+      width: 440px;
+      height: 550px;
+      padding: 30px 36px 20px 36px;
+      background-color: var(--paper-ivory);
+      background-image: 
+        linear-gradient(to left, rgba(0,0,0,0.03) 0%, transparent 10%, rgba(20,12,6,0.08) 88%, rgba(20,12,6,0.32) 100%),
+        url('../assets/textures/moda-page-gutter-paper.webp');
+      background-size: cover;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+      border-radius: 0 4px 4px 0;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+
+    /* =========================================================
+       COMPOSICIÓN A: DOS COLUMNAS EQUILIBRADAS
+       ========================================================= */
+    .sheet-scrapbook-duo {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      position: relative;
+      padding-top: 6px;
+      box-sizing: border-box;
+    }
+
+    .col-sarmiento {
+      width: 51%;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .date-1951 {
+      width: 80%;
+      max-width: 136px;
+      margin-bottom: 7px;
+      margin-left: 2px;
+      mix-blend-mode: multiply;
+      transform: rotate(-0.3deg);
+      user-select: none;
+    }
+
+    .clipping-sarmiento {
+      width: 100%;
+      border-radius: 1px;
+      box-shadow: 
+        0 2px 4px rgba(40, 28, 15, 0.22),
+        0 6px 14px rgba(30, 20, 10, 0.14);
+      transform: rotate(-0.4deg);
+      user-select: none;
+      display: block;
+    }
+
+    .col-bastianini {
+      width: 46%;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      margin-top: 14px;
+    }
+
+    .clipping-bastianini {
+      width: 100%;
+      border-radius: 1px;
+      box-shadow: 
+        0 2px 4px rgba(40, 28, 15, 0.22),
+        0 6px 14px rgba(30, 20, 10, 0.14);
+      transform: rotate(0.4deg);
+      user-select: none;
+      display: block;
+    }
+
+    .date-lanacion {
+      width: 105%;
+      max-width: 175px;
+      margin-top: 10px;
+      margin-left: -5px;
+      mix-blend-mode: multiply;
+      transform: rotate(0.2deg);
+      user-select: none;
+    }
+
+    /* =========================================================
+       COMPOSICIÓN B: ESCALONADA ASIMÉTRICA ORGÁNICA
+       ========================================================= */
+    .sheet-scrapbook-staggered {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      position: relative;
+      box-sizing: border-box;
+    }
+
+    .staggered-1951 {
+      position: absolute;
+      top: 4px;
+      left: 2px;
+      width: 184px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      z-index: 2;
+    }
+
+    .staggered-1959 {
+      position: absolute;
+      bottom: 6px;
+      right: 2px;
+      width: 168px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      z-index: 3;
+    }
+  </style>
+</head>
+<body>
+  <h1>Laboratorio de Composición: Hoja 01/35</h1>
+
+  <div class="test-card">
+    <div class="test-title">Composición A: Dos columnas documentales (1951 y 1959 armonizadas)</div>
+    <div class="mock-page">
+      <div class="sheet-scrapbook-duo">
+        <div class="col-sarmiento">
+          <img src="../assets/sheet-01/date-1951.png" alt="sept. 1.951" class="date-1951">
+          <img src="../assets/sheet-01/clipping-sarmiento-1951.png" alt="Biblioteca Popular Sarmiento 1951" class="clipping-sarmiento">
+        </div>
+        <div class="col-bastianini">
+          <img src="../assets/sheet-01/clipping-bastianini-1959.png" alt="Certamen René Bastianini 1959" class="clipping-bastianini">
+          <img src="../assets/sheet-01/date-lanacion-1959.png" alt="LA NACIÓN 2/3 Dbre/59" class="date-lanacion">
+        </div>
+      </div>
+      <footer class="sheet-footer">
+        <span class="sheet-number-display">01/35</span>
+      </footer>
+    </div>
+  </div>
+
+  <div class="test-card">
+    <div class="test-title">Composición B: Escalonada asimétrica orgánica</div>
+    <div class="mock-page">
+      <div class="sheet-scrapbook-staggered">
+        <div class="staggered-1951">
+          <img src="../assets/sheet-01/date-1951.png" alt="sept. 1.951" class="date-1951">
+          <img src="../assets/sheet-01/clipping-sarmiento-1951.png" alt="Biblioteca Popular Sarmiento 1951" class="clipping-sarmiento">
+        </div>
+        <div class="staggered-1959">
+          <img src="../assets/sheet-01/clipping-bastianini-1959.png" alt="Certamen René Bastianini 1959" class="clipping-bastianini">
+          <img src="../assets/sheet-01/date-lanacion-1959.png" alt="LA NACIÓN 2/3 Dbre/59" class="date-lanacion">
+        </div>
+      </div>
+      <footer class="sheet-footer">
+        <span class="sheet-number-display">01/35</span>
+      </footer>
+    </div>
+  </div>
+</body>
+</html>

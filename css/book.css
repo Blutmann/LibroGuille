@@ -744,6 +744,87 @@
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
 }
 
+/* ==========================================================================
+   COMPOSICIÓN DOCUMENTAL ARCHIVÍSTICA — HOJA 01/35
+   Primeros reconocimientos literarios de Guillermo Bautista Harispe (1951 - 1959)
+   ========================================================================== */
+
+.sheet-scrapbook-composition {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  position: relative;
+  padding: 4px 2px 2px 2px;
+  box-sizing: border-box;
+}
+
+.scrapbook-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  position: relative;
+}
+
+.col-sarmiento {
+  width: 51.5%;
+}
+
+.date-typewritten-1951 {
+  width: 78%;
+  max-width: 136px;
+  height: auto;
+  margin-bottom: 7px;
+  margin-left: 2px;
+  mix-blend-mode: multiply;
+  transform: rotate(-0.35deg);
+  user-select: none;
+  pointer-events: none;
+}
+
+.clipping-card-1 {
+  width: 100%;
+  height: auto;
+  border-radius: 1px;
+  box-shadow: 
+    0 2px 5px rgba(40, 28, 15, 0.24),
+    0 6px 14px rgba(30, 20, 10, 0.15);
+  transform: rotate(-0.4deg);
+  user-select: none;
+  display: block;
+}
+
+.col-bastianini {
+  width: 45.5%;
+  margin-top: 14px; /* Escalonamiento documental orgánico */
+}
+
+.clipping-card-2 {
+  width: 100%;
+  height: auto;
+  border-radius: 1px;
+  box-shadow: 
+    0 2px 5px rgba(40, 28, 15, 0.24),
+    0 6px 14px rgba(30, 20, 10, 0.15);
+  transform: rotate(0.4deg);
+  user-select: none;
+  display: block;
+}
+
+.date-handwritten-1959 {
+  width: 106%;
+  max-width: 178px;
+  height: auto;
+  margin-top: 10px;
+  margin-left: -5px;
+  mix-blend-mode: multiply;
+  transform: rotate(0.25deg);
+  user-select: none;
+  pointer-events: none;
+}
+
 /* Pie de hoja discreto con numeración editorial (ej: 01/35) */
 .sheet-footer {
   width: 100%;
@@ -1142,5 +1223,24 @@
 
   .btn-text-desktop {
     display: none;
+  }
+
+  /* Adaptación de composición Hoja 01 en pantallas móviles */
+  .sheet-scrapbook-composition {
+    gap: 10px;
+    padding: 2px 0;
+  }
+  .col-sarmiento {
+    width: 52%;
+  }
+  .col-bastianini {
+    width: 46%;
+    margin-top: 8px;
+  }
+  .date-typewritten-1951 {
+    margin-bottom: 4px;
+  }
+  .date-handwritten-1959 {
+    margin-top: 6px;
   }
 }

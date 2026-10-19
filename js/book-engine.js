@@ -1222,13 +1222,30 @@ export class BookEngine {
     }
 
     if (pageData.sheetNumber) {
-      const imageHtml = pageData.image 
-        ? `<img src="${pageData.image}" alt="Hoja ${pageData.sheetLabel}" class="sheet-scanned-image" loading="lazy">` 
-        : '';
+      let mainInnerHtml = '';
+      if (pageData.sheetNumber === 1) {
+        mainInnerHtml = `
+          <div class="sheet-scrapbook-composition" aria-label="Composición documental: Primeros reconocimientos literarios (1951 - 1959)">
+            <!-- Columna izquierda: 1951, Biblioteca Popular Sarmiento -->
+            <div class="scrapbook-col col-sarmiento">
+              <img src="assets/sheet-01/date-1951.png" alt="sept. 1.951 (fecha mecanografiada)" class="date-typewritten-1951" loading="eager">
+              <img src="assets/sheet-01/clipping-sarmiento-1951.png" alt="Recorte periodístico original: Biblioteca Popular 'Sarmiento' - Acto Literario, Segundo premio a Guillermo B. Harispe" class="clipping-card-1" loading="eager">
+            </div>
+            <!-- Columna derecha: 1959, Certamen René Bastianini -->
+            <div class="scrapbook-col col-bastianini">
+              <img src="assets/sheet-01/clipping-bastianini-1959.png" alt="Recorte periodístico original: El VI Certamen René Bastianini 1959 - Mención de honor a Guillermo B. Harispe" class="clipping-card-2" loading="eager">
+              <img src="assets/sheet-01/date-lanacion-1959.png" alt="LA NACIÓN 2/3 Dbre/59 (fecha manuscrita en birome azul)" class="date-handwritten-1959" loading="eager">
+            </div>
+          </div>
+        `;
+      } else if (pageData.image) {
+        mainInnerHtml = `<img src="${pageData.image}" alt="Hoja ${pageData.sheetLabel}" class="sheet-scanned-image" loading="lazy">`;
+      }
+
       return `
         <div class="page-content-wrapper sheet-layout" data-sheet-index="${pageData.sheetNumber}">
           <div class="sheet-main-content" data-sheet="${pageData.sheetNumber}">
-            ${imageHtml}
+            ${mainInnerHtml}
           </div>
           <footer class="sheet-footer">
             <span class="sheet-number-display">${pageData.sheetLabel}</span>
