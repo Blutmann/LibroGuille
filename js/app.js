@@ -51,6 +51,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  window.book = book;
+
   // Inicializar la máquina de escribir mecánica 3D con Web Audio API (Etapa C)
   const typewriter = new TypewriterController({
     container: sceneTypewriter,
@@ -136,17 +138,25 @@ document.addEventListener('DOMContentLoaded', () => {
     btnPrev.disabled = false;
     btnNext.disabled = !state.canGoNext;
 
-    // Etiqueta legible de páginas
+    // Etiqueta legible de hojas
     const { left, right } = state.visiblePages;
-    if (state.currentIndex >= state.totalPages - 1) {
+    if (state.currentIndex >= state.totalPages - 2) {
       pageIndicator.textContent = "Contratapa posterior";
     } else if (book.isMobile) {
-      const pNum = right ? (right.pageNumber ? `Página ${right.pageNumber}` : right.title) : '';
-      pageIndicator.textContent = `${pNum} · (${state.currentIndex + 1} de ${state.totalPages})`;
+      const label = right?.sheetLabel ? `Hoja ${right.sheetLabel}` : (right?.title || '');
+      pageIndicator.textContent = label;
     } else {
-      const leftLabel = left ? (left.pageNumber ? `Pág. ${left.pageNumber}` : left.title) : '';
-      const rightLabel = right ? (right.pageNumber ? `Pág. ${right.pageNumber}` : right.title) : '';
-      pageIndicator.textContent = `${leftLabel} y ${rightLabel} · (${state.currentIndex + 1} de ${state.totalPages})`;
+      let label = "";
+      if (left?.sheetLabel && right?.sheetLabel) {
+        label = `Hojas ${left.sheetLabel} y ${right.sheetLabel}`;
+      } else if (!left?.sheetLabel && right?.sheetLabel) {
+        label = `Guarda interior y Hoja ${right.sheetLabel}`;
+      } else if (left?.sheetLabel && !right?.sheetLabel) {
+        label = `Hoja ${left.sheetLabel} y Guarda posterior`;
+      } else {
+        label = `${left?.title || ''} y ${right?.title || ''}`;
+      }
+      pageIndicator.textContent = label;
     }
   }
 

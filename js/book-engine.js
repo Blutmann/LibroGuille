@@ -326,7 +326,7 @@ export class BookEngine {
     } else {
       this.container.classList.remove('is-closed');
       if (this.currentIndex === 0) {
-        this.currentIndex = 1;
+        this.currentIndex = this.isMobile ? 2 : 1;
       }
     }
 
@@ -351,11 +351,11 @@ export class BookEngine {
 
     // Visibilidad y z-index de la tapa frontal
     if (this.frontCoverEl) {
-      if (this.currentIndex > 2 && this.coverAngle >= 175) {
+      if (this.currentIndex > 1 && this.coverAngle >= 170) {
         this.frontCoverEl.style.display = 'none';
       } else {
         this.frontCoverEl.style.display = 'block';
-        this.frontCoverEl.style.zIndex = this.currentIndex <= 1 ? '70' : '5';
+        this.frontCoverEl.style.zIndex = this.currentIndex <= 1 ? '70' : '1';
       }
     }
 
@@ -405,7 +405,7 @@ export class BookEngine {
   openBook() {
     if (this.coverAngle >= 170) return;
     this.animateCoverTo(180, 520, () => {
-      this.currentIndex = 1;
+      this.currentIndex = this.isMobile ? 2 : 1;
       this.renderCurrentSpread();
       this.notifyChange();
     });
@@ -414,7 +414,7 @@ export class BookEngine {
   closeBook() {
     if (this.coverAngle <= 5) return;
     if (this.currentIndex > 1) {
-      this.currentIndex = 1;
+      this.currentIndex = this.isMobile ? 2 : 1;
       this.renderCurrentSpread();
     }
     this.animateCoverTo(0, 520, () => {
@@ -649,7 +649,8 @@ export class BookEngine {
     }
 
     // Comprobar límites
-    if (direction === 'next' && this.currentIndex >= this.pages.length - 1) return;
+    const maxIndex = this.pages.length - 2;
+    if (direction === 'next' && this.currentIndex >= maxIndex) return;
     if (direction === 'prev' && this.currentIndex <= 1) return;
 
     this.activeGesture = direction === 'next' ? 'PAGE_NEXT' : 'PAGE_PREV';
@@ -788,7 +789,7 @@ export class BookEngine {
 
       if (complete) {
         if (direction === 'next') {
-          this.currentIndex = Math.min(this.pages.length - 1, this.currentIndex + 2);
+          this.currentIndex = Math.min(this.pages.length - 2, this.currentIndex + 2);
         } else {
           this.currentIndex = Math.max(1, this.currentIndex - 2);
         }
@@ -955,10 +956,19 @@ export class BookEngine {
       return;
     }
 
-    if (this.currentIndex >= this.pages.length - 1) return;
+    const maxIndex = this.pages.length - 2;
+    if (this.currentIndex >= maxIndex) return;
 
-    if (this.prefersReducedMotion() || this.isMobile) {
-      this.currentIndex = Math.min(this.pages.length - 1, this.currentIndex + 2);
+    if (this.isMobile) {
+      this.currentIndex = Math.min(maxIndex, this.currentIndex + 1);
+      this.renderCurrentSpread();
+      this.updateDynamicThickness();
+      this.notifyChange();
+      return;
+    }
+
+    if (this.prefersReducedMotion()) {
+      this.currentIndex = Math.min(maxIndex, this.currentIndex + 2);
       this.renderCurrentSpread();
       this.updateDynamicThickness();
       this.notifyChange();
@@ -969,6 +979,11 @@ export class BookEngine {
     const oldRightData = this.getVisiblePages().right;
     const nextLeftIndex = this.currentIndex + 2;
     const newLeftData = this.pages[nextLeftIndex];
+
+    // Revelar la página siguiente que quedará debajo en el hemisferio derecho
+    if (this.rightContentEl && this.pages[nextLeftIndex + 1]) {
+      this.rightContentEl.innerHTML = this.renderPageContent(this.pages[nextLeftIndex + 1]);
+    }
 
     const leaf = document.createElement('div');
     leaf.className = 'flipping-leaf flip-right-to-left is-finishing-turn';
@@ -998,7 +1013,7 @@ export class BookEngine {
       leaf.removeEventListener('transitionend', handleAnimEnd);
       leaf.remove();
       this.activeLeafEl = null;
-      this.currentIndex = Math.min(this.pages.length - 1, this.currentIndex + 2);
+      this.currentIndex = Math.min(maxIndex, this.currentIndex + 2);
       this.renderCurrentSpread();
       this.updateDynamicThickness();
       this.isAnimating = false;
@@ -1014,12 +1029,24 @@ export class BookEngine {
 
     if (this.coverAngle < 90) return;
 
+    if (this.isMobile) {
+      if (this.currentIndex <= 2) {
+        this.closeBook();
+        return;
+      }
+      this.currentIndex = Math.max(2, this.currentIndex - 1);
+      this.renderCurrentSpread();
+      this.updateDynamicThickness();
+      this.notifyChange();
+      return;
+    }
+
     if (this.currentIndex <= 1) {
       this.closeBook();
       return;
     }
 
-    if (this.prefersReducedMotion() || this.isMobile) {
+    if (this.prefersReducedMotion()) {
       this.currentIndex = Math.max(1, this.currentIndex - 2);
       this.renderCurrentSpread();
       this.updateDynamicThickness();
@@ -1031,6 +1058,11 @@ export class BookEngine {
     const currentLeftData = this.getVisiblePages().left;
     const targetIndex = Math.max(1, this.currentIndex - 2);
     const prevRightData = this.pages[targetIndex + 1];
+
+    // Revelar la página previa que quedará debajo en el hemisferio izquierdo
+    if (this.leftContentEl && this.pages[targetIndex]) {
+      this.leftContentEl.innerHTML = this.renderPageContent(this.pages[targetIndex]);
+    }
 
     const leaf = document.createElement('div');
     leaf.className = 'flipping-leaf flip-left-to-right is-finishing-turn';
@@ -1076,16 +1108,19 @@ export class BookEngine {
   // ==========================================================================
 
   getVisiblePages() {
-    if (this.isClosed || this.currentIndex <= 1) {
-      return { left: this.pages[1] || null, right: this.pages[2] || this.pages[0] };
+    if (this.isClosed || this.currentIndex <= 0) {
+      return { left: null, right: this.pages[0] || null };
     }
 
     if (this.isMobile) {
-      return { left: null, right: this.pages[this.currentIndex] };
+      return { left: null, right: this.pages[this.currentIndex] || null };
     }
 
-    if (this.currentIndex >= this.pages.length - 1) {
-      return { left: this.pages[this.pages.length - 1], right: null };
+    if (this.currentIndex >= this.pages.length - 2) {
+      return {
+        left: this.pages[this.pages.length - 2] || null,
+        right: this.pages[this.pages.length - 1] || null
+      };
     }
 
     const leftIndex = this.currentIndex % 2 === 1 ? this.currentIndex : this.currentIndex - 1;
@@ -1130,10 +1165,12 @@ export class BookEngine {
       this.leftPageEl.style.width = '50%';
       this.leftContentEl.innerHTML = this.renderPageContent(left);
       if (this.currentIndex <= 1) {
+        this.container.classList.add('is-cover-view');
         this.leftPageEl.style.opacity = '0';
         this.leftPageEl.style.pointerEvents = 'none';
         this.leftPageEl.style.visibility = 'hidden';
       } else {
+        this.container.classList.remove('is-cover-view');
         this.leftPageEl.style.opacity = '1';
         this.leftPageEl.style.pointerEvents = 'auto';
         this.leftPageEl.style.visibility = 'visible';
@@ -1149,9 +1186,11 @@ export class BookEngine {
     // Asegurar jerarquía física: en pliegos interiores la tapa queda por detrás y no intercepta clics
     if (this.frontCoverEl) {
       if (this.currentIndex <= 1) {
+        this.frontCoverEl.style.display = 'block';
         this.frontCoverEl.style.zIndex = '70';
         this.frontCoverEl.style.pointerEvents = 'auto';
       } else {
+        this.frontCoverEl.style.display = 'none';
         this.frontCoverEl.style.zIndex = '1';
         this.frontCoverEl.style.pointerEvents = 'none';
       }
@@ -1160,45 +1199,36 @@ export class BookEngine {
 
   renderPageContent(pageData) {
     if (!pageData) {
-      return `<div class="page-content-area" style="opacity: 0.15; text-align: center;">(Página en blanco)</div>`;
+      return `<div class="page-content-wrapper sheet-layout guard-sheet"><div class="sheet-main-content"></div></div>`;
     }
 
-    const badgeHtml = pageData.badge 
-      ? `<span class="page-fictional-tag">${pageData.badge}</span>` 
-      : '';
+    if (pageData.sheetNumber) {
+      const imageHtml = pageData.image 
+        ? `<img src="${pageData.image}" alt="Hoja ${pageData.sheetLabel}" class="sheet-scanned-image" loading="lazy">` 
+        : '';
+      return `
+        <div class="page-content-wrapper sheet-layout" data-sheet-index="${pageData.sheetNumber}">
+          <div class="sheet-main-content" data-sheet="${pageData.sheetNumber}">
+            ${imageHtml}
+          </div>
+          <footer class="sheet-footer">
+            <span class="sheet-number-display">${pageData.sheetLabel}</span>
+          </footer>
+        </div>
+      `;
+    }
 
-    const pageNumberHtml = pageData.pageNumber !== null 
-      ? `<span class="page-footer-num">${pageData.pageNumber}</span>` 
-      : `<span></span>`;
-
-    let bodyHtml = pageData.body || '';
-
-    // Si tiene fotografía simulada
-    if (pageData.photo) {
-      bodyHtml = `
-        <figure class="page-photo-frame">
-          <img src="${pageData.photo.src}" alt="${pageData.photo.caption || 'Fotografía de archivo'}" loading="lazy">
-          ${pageData.photo.caption ? `<figcaption class="page-photo-caption">${pageData.photo.caption}</figcaption>` : ''}
-        </figure>
-        ${bodyHtml}
+    if (pageData.type === 'inside-cover' || pageData.type === 'inside-back-cover') {
+      return `
+        <div class="page-content-wrapper sheet-layout guard-sheet">
+          <div class="sheet-main-content"></div>
+        </div>
       `;
     }
 
     return `
-      <div class="page-content-wrapper">
-        <header class="page-header-row">
-          <span class="page-header-title">${this.metadata.title}</span>
-          ${badgeHtml}
-        </header>
-        <div class="page-body-scrollable">
-          ${pageData.title && pageData.type !== 'title-page' ? `<h3 class="page-heading">${pageData.title}</h3>` : ''}
-          ${pageData.subtitle ? `<h4 class="page-subheading">${pageData.subtitle}</h4>` : ''}
-          <div class="page-prose">${bodyHtml}</div>
-        </div>
-        <footer class="page-footer-row">
-          <span class="page-footer-author">${this.metadata.author}</span>
-          ${pageNumberHtml}
-        </footer>
+      <div class="page-content-wrapper sheet-layout">
+        <div class="sheet-main-content"></div>
       </div>
     `;
   }
@@ -1214,21 +1244,55 @@ export class BookEngine {
 
     if (this.isClosed) {
       text += `[Estado: Libro cerrado sobre el escritorio]\n`;
-      text += `${this.pages[0].transcription || 'Tapa frontal con títulos en dorado.'}\n`;
+      text += `${this.pages[0]?.transcription || 'Tapa frontal con títulos en bajo relieve.'}\n`;
       return text;
     }
 
     if (left) {
-      text += `--- PÁGINA IZQUIERDA (${left.title || 'Guarda'}) ---\n`;
-      text += `${left.transcription || left.body || ''}\n\n`;
+      const leftTitle = left.sheetLabel ? `Hoja ${left.sheetLabel}` : (left.title || 'Guarda');
+      text += `--- LADO IZQUIERDO (${leftTitle}) ---\n`;
+      text += `${left.transcription || '(Hoja vacía preparada para escaneo original)'}\n\n`;
     }
 
     if (right) {
-      text += `--- PÁGINA DERECHA (${right.title || `Página ${right.pageNumber}`}) ---\n`;
-      text += `${right.transcription || right.body || ''}\n\n`;
+      const rightTitle = right.sheetLabel ? `Hoja ${right.sheetLabel}` : (right.title || 'Guarda');
+      text += `--- LADO DERECHO (${rightTitle}) ---\n`;
+      text += `${right.transcription || '(Hoja vacía preparada para escaneo original)'}\n\n`;
     }
 
     return text;
+  }
+
+  goToPage(pageIndex) {
+    const maxIndex = this.pages.length - 2;
+    const target = Math.max(0, Math.min(maxIndex, pageIndex));
+    if (target === 0) {
+      this.closeBook();
+      return;
+    }
+    if (this.isClosed) {
+      this.openBook();
+    }
+    this.currentIndex = target;
+    this.renderCurrentSpread();
+    this.updateDynamicThickness();
+    this.notifyChange();
+  }
+
+  goToSheet(sheetNum) {
+    if (sheetNum < 1 || sheetNum > 35) return;
+    const targetPageIndex = sheetNum + 1; // hoja 1 está en el índice 2
+    if (this.isClosed) {
+      this.openBook();
+    }
+    if (this.isMobile) {
+      this.currentIndex = targetPageIndex;
+    } else {
+      this.currentIndex = targetPageIndex % 2 === 1 ? targetPageIndex : targetPageIndex - 1;
+    }
+    this.renderCurrentSpread();
+    this.updateDynamicThickness();
+    this.notifyChange();
   }
 
   notifyChange() {
@@ -1237,7 +1301,7 @@ export class BookEngine {
       totalPages: this.pages.length,
       isClosed: this.isClosed,
       coverAngle: this.coverAngle,
-      canGoNext: this.currentIndex < this.pages.length - 1,
+      canGoNext: this.currentIndex < (this.pages.length - 2),
       canGoPrev: this.currentIndex > 0 || this.coverAngle > 10,
       visiblePages: this.getVisiblePages(),
       isDeskPanMode: this.isDeskPanMode,
