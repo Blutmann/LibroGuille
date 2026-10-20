@@ -37,7 +37,8 @@ export class BookEngine {
       { label: '16° · Lectura suave', pitch: 16 },
       { label: '32° · Perspectiva', pitch: 32 },
       { label: '48° · Profunda', pitch: 48 },
-      { label: '-18° · Contrapicado', pitch: -18 }
+      { label: '-18° · Contrapicado', pitch: -18 },
+      { label: '-32° · Contrapicado profundo', pitch: -32 }
     ];
     this.pitchIndex = 1;
 

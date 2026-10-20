@@ -253,6 +253,26 @@ try {
   curYaw = await evalInPage(`window.book.viewYaw`);
   console.log(`   - Tras setPresetPitch(32): pitch=${curPitch}°, yaw=${curYaw}°`);
   if (curPitch !== 32 || curYaw !== 0) throw new Error(`Preset debió fijar pitch en 32 y restablecer yaw a 0`);
+
+  // Preset -32° Contrapicado profundo
+  await evalInPage(`
+    const btnMinus32 = document.querySelector('.tilt-menu-item[data-pitch="-32"]');
+    if (btnMinus32) btnMinus32.click();
+    else window.book.setPresetPitch(-32);
+  `);
+  await new Promise(r => setTimeout(r, 500));
+  curPitch = await evalInPage(`window.book.viewPitch`);
+  const isSelectedMinus32 = await evalInPage(`
+    (() => {
+      const btn = document.querySelector('.tilt-menu-item[data-pitch="-32"]');
+      return btn ? btn.classList.contains('is-selected') : false;
+    })()
+  `);
+  const cssPitchMinus32 = await evalInPage(`document.getElementById('bookPanContainer').style.getPropertyValue('--view-pitch')`);
+  console.log(`   - Tras preset -32°: pitch=${curPitch}°, css=${cssPitchMinus32}, is-selected=${isSelectedMinus32}`);
+  if (curPitch !== -32) throw new Error(`Preset -32° falló al establecer pitch=-32`);
+  if (!isSelectedMinus32) throw new Error(`El botón -32° debe tener clase is-selected`);
+  console.log('   ✓ Preset -32° Contrapicado profundo verificado exitosamente.');
   console.log('   ✓ Presets y botón restablecer restauran los ángulos de referencia fielmente.');
 
   // 5. COMPATIBILIDAD CON RECORTE EN PRIMER PLANO
@@ -324,6 +344,11 @@ try {
   await evalInPage(`window.book.setTilt(20, -24)`);
   await new Promise(r => setTimeout(r, 300));
   await captureScreenshot('tests/screenshots/tilt-closed-pitch20-yawNeg24.png');
+
+  // Ángulo 5: Libro con inclinación contrapicado profundo -32°
+  await evalInPage(`window.book.setTilt(-32, 0)`);
+  await new Promise(r => setTimeout(r, 300));
+  await captureScreenshot('tests/screenshots/tilt-pitchMinus32.png');
 
   // Restaurar estado base
   await evalInPage(`window.book.resetPan()`);
