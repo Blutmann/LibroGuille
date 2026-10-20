@@ -264,6 +264,11 @@ export class BookEngine {
     if (this.frontCoverBackContentEl && this.pages[1]) {
       this.frontCoverBackContentEl.innerHTML = this.renderPageContent(this.pages[1]);
     }
+
+    // Pre-cargar Hoja 01 en la base derecha para que al abrir la tapa se descubra progresivamente
+    if (this.rightContentEl && this.pages[2]) {
+      this.rightContentEl.innerHTML = this.renderPageContent(this.pages[2]);
+    }
   }
 
   prefersReducedMotion() {
@@ -582,6 +587,82 @@ export class BookEngine {
   // 4. CTRL + arrastrar horizontal: Cambiar tamaño del libro (Zoom).
   // ==========================================================================
 
+  // Polígonos normalizados (0 a 100%) del contorno irregular de corte de tijera
+  getClippingPolygon(type) {
+    switch (type) {
+      case 'sarmiento':
+        return [
+          [1.05, 0.59], [12.13, 0.68], [28.87, 0.82], [49.79, 0.94], [70.71, 1.12], [87.45, 1.32], [98.54, 1.53],
+          [98.95, 2.06], [98.83, 14.41], [98.74, 29.12], [98.54, 43.82], [98.12, 58.53], [97.82, 73.24], [97.41, 87.94],
+          [96.99, 98.68], [96.44, 99.18], [85.36, 99.12], [68.62, 99.26], [51.88, 99.18], [33.05, 99.06], [14.23, 98.97],
+          [1.88, 98.82], [0.92, 98.24], [1.05, 87.94], [1.17, 70.29], [1.26, 52.65], [1.13, 35.00], [1.00, 17.35], [0.92, 2.65]
+        ];
+      case 'bastianini':
+        return [
+          [3.25, 1.39], [17.80, 1.10], [36.13, 0.81], [57.07, 0.64], [78.01, 0.58], [96.60, 0.64], [97.28, 1.16],
+          [96.96, 11.56], [96.86, 23.12], [97.28, 37.57], [97.80, 52.02], [98.43, 66.47], [98.85, 80.92], [98.69, 93.93],
+          [97.91, 98.84], [83.25, 98.99], [67.54, 99.19], [46.60, 99.13], [28.27, 98.99], [9.95, 98.84], [1.57, 98.70],
+          [0.94, 97.98], [1.31, 93.93], [1.99, 79.48], [2.72, 65.03], [3.40, 50.58], [3.56, 36.13], [3.46, 21.68], [3.25, 8.67]
+        ];
+      case 'nino-dice':
+        return [
+          [0.65, 0.69], [13.59, 0.66], [29.77, 0.58], [47.57, 0.52], [65.37, 0.44], [83.17, 0.38], [97.41, 0.30],
+          [97.90, 0.55], [97.80, 8.52], [97.73, 19.51], [97.90, 30.49], [98.12, 41.48], [98.38, 52.47], [98.64, 63.46],
+          [98.87, 74.45], [99.03, 85.44], [99.19, 92.31], [99.35, 99.45], [98.87, 99.70], [83.17, 99.66], [63.75, 99.62],
+          [44.34, 99.59], [24.92, 99.56], [10.36, 99.52], [2.59, 99.48], [2.10, 99.24], [2.20, 89.56], [1.94, 77.20],
+          [1.68, 66.21], [1.46, 55.22], [1.23, 44.23], [0.97, 33.24], [0.81, 22.25], [0.65, 11.26], [0.58, 0.96]
+        ];
+      case 'trinchera':
+        return [
+          [0.94, 0.25], [13.21, 0.51], [30.50, 0.83], [49.37, 1.15], [68.24, 1.46], [85.53, 1.72], [99.06, 1.97],
+          [99.37, 2.23], [99.12, 10.32], [98.90, 20.51], [98.68, 30.70], [98.27, 40.89], [97.80, 51.08], [97.33, 61.27],
+          [96.70, 71.46], [96.07, 81.66], [95.35, 90.57], [94.97, 96.94], [94.81, 99.55], [94.18, 99.75], [80.82, 99.72],
+          [61.95, 99.68], [43.08, 99.64], [24.21, 99.62], [8.49, 99.59], [0.94, 99.55], [0.47, 99.36], [0.57, 91.85],
+          [0.63, 80.38], [0.69, 68.92], [0.63, 57.45], [0.69, 47.26], [0.79, 37.07], [0.88, 26.88], [0.79, 16.69],
+          [0.88, 6.50], [0.88, 0.51]
+        ];
+      default:
+        return null;
+    }
+  }
+
+  getClippingTypeFromElement(el) {
+    if (!el) return null;
+    if (el.classList.contains('wrap-sarmiento') || el.querySelector('.clipping-card-1')) return 'sarmiento';
+    if (el.classList.contains('wrap-bastianini') || el.querySelector('.clipping-card-2')) return 'bastianini';
+    if (el.classList.contains('wrap-nino-dice') || el.querySelector('.clipping-card-nino')) return 'nino-dice';
+    if (el.classList.contains('wrap-trinchera') || el.querySelector('.clipping-card-trinchera')) return 'trinchera';
+    return null;
+  }
+
+  isPointInClippingSilhouette(wrapEl, clientX, clientY) {
+    if (!wrapEl) return false;
+    const type = this.getClippingTypeFromElement(wrapEl);
+    const poly = this.getClippingPolygon(type);
+    if (!poly) return true;
+
+    const rect = wrapEl.getBoundingClientRect();
+    if (clientX < rect.left || clientX > rect.right || clientY < rect.top || clientY > rect.bottom) {
+      return false;
+    }
+
+    // Coordenadas relativas en porcentaje (0 a 100)
+    const px = ((clientX - rect.left) / rect.width) * 100;
+    const py = ((clientY - rect.top) / rect.height) * 100;
+
+    // Algoritmo Ray-Casting
+    let inside = false;
+    for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+      const xi = poly[i][0], yi = poly[i][1];
+      const xj = poly[j][0], yj = poly[j][1];
+
+      const intersect = ((yi > py) !== (yj > py)) &&
+        (px < (xj - xi) * (py - yi) / (yj - yi) + xi);
+      if (intersect) inside = !inside;
+    }
+    return inside;
+  }
+
   bindUnifiedGestureEvents() {
     const target = this.panContainer;
 
@@ -594,9 +675,10 @@ export class BookEngine {
         return;
       }
 
-      // Si el usuario presiona sobre un recorte interactivo en una hoja abierta:
+      // Si el usuario presiona dentro del contorno físico de un recorte interactivo:
       // Bloquear temporalmente el arrastre de la página para dar prioridad al recorte
-      if (e.target.closest('.clipping-card-wrap, [data-clipping="true"]') && !this.isClosed && this.coverAngle >= 150) {
+      const touchedClipping = e.target.closest('.clipping-card-wrap, [data-clipping="true"]');
+      if (touchedClipping && !this.isClosed && this.coverAngle >= 150 && this.isPointInClippingSilhouette(touchedClipping, e.clientX, e.clientY)) {
         return;
       }
 
@@ -626,11 +708,11 @@ export class BookEngine {
         return;
       }
 
-      // GESTO 4: Interacción directa con el libro físico (Tapa o Páginas)
-      // Si el usuario toca el escritorio fuera del libro SIN modificadores: NO MOVER EL LIBRO
+      // GESTO 4: Interacción física con zonas claramente delimitadas
+      // Si el usuario toca el escritorio fuera del libro: ignorar
       const touchedBook = e.target.closest('#bookContainer');
       if (!touchedBook) {
-        return; // Clic o arrastre neutro sobre la mesa no desplaza el libro
+        return;
       }
 
       this.gestureStartTime = performance.now();
@@ -646,29 +728,36 @@ export class BookEngine {
       this.grabNormX = (e.clientX - centerX) / (rect.width / 2);
       this.grabNormY = (e.clientY - centerY) / (rect.height / 2);
 
-      // CASO A: Libro cerrado o en inicio de apertura
+      // Delimitación física de zonas de interacción en los extremos del libro visible
+      // Ancho total del pliego abierto = rect.width; hoja = rect.width / 2
+      // Extremo izquierdo (~25% exterior) y Extremo derecho (~25% exterior)
+      const isExplicitTrigger = !!e.target.closest('[data-leaf-trigger], .page-edge-strip, .page-turn-trigger, .cover-open-affordance, .cover-pocket-sleeve');
+      const isLeftOuterEdge = (e.clientX <= rect.left + rect.width * 0.25);
+      const isRightOuterEdge = (e.clientX >= rect.right - rect.width * 0.25);
+
+      // En libro cerrado, la tapa completa o el extremo derecho permite arrastrar para abrir
       if (this.isClosed || this.coverAngle < 15) {
-        this.startCoverDragGesture(e);
+        if (isRightOuterEdge || isExplicitTrigger || e.clientX >= centerX) {
+          this.startCoverDragGesture(e);
+        }
         return;
       }
 
-      // CASO B: Libro abierto o entreabierto
-      const isLeftTouch = (e.clientX < centerX);
-
-      if (isLeftTouch) {
+      // Libro abierto o en proceso de giro:
+      // ZONA IZQUIERDA (Extremo físico izquierdo): retroceder o cerrar según el estado
+      if (isLeftOuterEdge || (isExplicitTrigger && e.target.closest('.edge-left, [data-leaf-trigger="prev"]'))) {
         if (this.currentIndex > 1) {
-          // En pliegos interiores (página 3 en adelante), arrastrar a la derecha retrocede de página
           this.startPageDragGesture(e, 'prev');
           return;
         } else {
-          // En pliego 1 (o portada), el hemisferio izquierdo es la contratapa/tapa: arrastrar a la derecha la cierra
+          // Pliego 02-03 (hoja 01): extremo izquierdo cierra el libro hacia la portada
           this.startCoverDragGesture(e);
           return;
         }
       }
 
-      // Hemisferio derecho (avance de página o apertura de tapa)
-      if (!isLeftTouch) {
+      // ZONA DERECHA (Extremo físico derecho): avanzar hoja/pliego o continuar abriendo
+      if (isRightOuterEdge || (isExplicitTrigger && e.target.closest('.edge-right, [data-leaf-trigger="next"]'))) {
         if (this.coverAngle < 165) {
           this.startCoverDragGesture(e);
           return;
@@ -677,11 +766,13 @@ export class BookEngine {
           return;
         }
       }
+
+      // Zona central/interior: lectura e inspección, no activa arrastre accidental de hoja
     };
 
     target.addEventListener('pointerdown', handlePointerDown);
 
-    // Detección de clic intencional en recortes periodísticos en hojas abiertas
+    // Detección de clic intencional en recortes periodísticos con delimitación estricta de silueta
     let clippingPointerTarget = null;
     let clippingPointerDownX = 0;
     let clippingPointerDownY = 0;
@@ -690,7 +781,7 @@ export class BookEngine {
     this.container.addEventListener('pointerdown', (e) => {
       if (this.isForegroundClippingActive || this.isClosed || this.coverAngle < 150) return;
       const wrap = e.target.closest('.clipping-card-wrap, [data-clipping="true"]');
-      if (wrap) {
+      if (wrap && this.isPointInClippingSilhouette(wrap, e.clientX, e.clientY)) {
         clippingPointerTarget = wrap;
         clippingPointerDownX = e.clientX;
         clippingPointerDownY = e.clientY;
@@ -708,8 +799,8 @@ export class BookEngine {
       const targetWrap = clippingPointerTarget;
       clippingPointerTarget = null;
 
-      // Clic intencional sobre el recorte (sin arrastre amplio de página)
-      if (dist < 12 && dt < 600) {
+      // Clic intencional sobre el recorte: verificar que al soltar también esté dentro de la silueta física
+      if (dist < 12 && dt < 600 && this.isPointInClippingSilhouette(targetWrap, e.clientX, e.clientY)) {
         e.preventDefault();
         e.stopPropagation();
         this.openForegroundClipping(targetWrap);
@@ -803,6 +894,12 @@ export class BookEngine {
     if (this.isForegroundClippingActive) return;
     this.activeGesture = 'COVER';
     this.gestureStartCoverAngle = this.coverAngle;
+
+    // Renderizado progresivo: asegurar que la base derecha muestre Hoja 01 al girar la tapa
+    if (this.rightContentEl && this.pages[2]) {
+      this.rightContentEl.innerHTML = this.renderPageContent(this.pages[2]);
+    }
+
     if (this.frontCoverEl) {
       this.frontCoverEl.classList.add('is-dragging');
     }
@@ -885,6 +982,7 @@ export class BookEngine {
 
     this.activeGesture = direction === 'next' ? 'PAGE_NEXT' : 'PAGE_PREV';
     this.leafProgress = 0;
+    this.container.classList.add('is-page-flipping');
 
     const rect = this.container.getBoundingClientRect();
     const pageWidth = rect.width / 2 || 490;
@@ -896,6 +994,12 @@ export class BookEngine {
     let frontContent = '';
     let backContent = '';
 
+    // Asegurar visibilidad progresiva de la página izquierda base durante el arrastre
+    if (this.leftPageEl) {
+      this.leftPageEl.style.opacity = '1';
+      this.leftPageEl.style.visibility = 'visible';
+    }
+
     if (direction === 'next') {
       const oldRightData = this.getVisiblePages().right;
       const nextLeftIndex = this.currentIndex + 2;
@@ -904,9 +1008,10 @@ export class BookEngine {
       frontContent = this.renderPageContent(oldRightData);
       backContent = this.renderPageContent(newLeftData);
 
-      // Actualizar página derecha base temporalmente para que al levantarse la hoja se vea la siguiente
-      if (this.rightContentEl && this.pages[nextLeftIndex + 1]) {
-        this.rightContentEl.innerHTML = this.renderPageContent(this.pages[nextLeftIndex + 1]);
+      // Revelar la página siguiente que queda descubierta progresivamente debajo del giro
+      const underlyingRightData = this.pages[nextLeftIndex + 1] || null;
+      if (this.rightContentEl) {
+        this.rightContentEl.innerHTML = this.renderPageContent(underlyingRightData);
       }
     } else {
       const currentLeftData = this.getVisiblePages().left;
@@ -916,9 +1021,10 @@ export class BookEngine {
       frontContent = this.renderPageContent(currentLeftData);
       backContent = this.renderPageContent(prevRightData);
 
-      // Actualizar página izquierda base temporalmente para que al levantarse la hoja se vea la anterior
-      if (this.leftContentEl && this.pages[targetIndex]) {
-        this.leftContentEl.innerHTML = this.renderPageContent(this.pages[targetIndex]);
+      // Revelar la página anterior que queda descubierta progresivamente debajo del giro
+      const underlyingLeftData = (targetIndex <= 1) ? this.pages[1] : (this.pages[targetIndex] || null);
+      if (this.leftContentEl) {
+        this.leftContentEl.innerHTML = this.renderPageContent(underlyingLeftData);
       }
     }
 
@@ -1016,6 +1122,7 @@ export class BookEngine {
       leafEl.removeEventListener('transitionend', cleanup);
       leafEl.remove();
       this.activeLeafEl = null;
+      this.container.classList.remove('is-page-flipping');
 
       if (complete) {
         if (direction === 'next') {
@@ -1358,7 +1465,7 @@ export class BookEngine {
 
   getVisiblePages() {
     if (this.isClosed || this.currentIndex <= 0) {
-      return { left: null, right: this.pages[0] || null };
+      return { left: null, right: this.pages[2] || this.pages[0] || null };
     }
 
     if (this.isMobile) {
@@ -1685,6 +1792,14 @@ export class BookEngine {
     const targetLeft = Math.round((viewportW - targetW) / 2) - layerRect.left;
     const targetTop = Math.round((viewportH - targetH) / 2) - layerRect.top;
 
+    // Asignar tipo de recorte para aplicar el clip-path idéntico a la tarjeta flotante
+    const clipType = this.getClippingTypeFromElement(sourceWrapEl);
+    if (clipType) {
+      this.clippingFloatingCard.setAttribute('data-clipping-type', clipType);
+    } else {
+      this.clippingFloatingCard.removeAttribute('data-clipping-type');
+    }
+
     this.clippingPanX = 0;
     this.clippingPanY = 0;
     this.clippingRotX = 0;
@@ -1794,6 +1909,7 @@ export class BookEngine {
       this.clippingRotX = 0;
       this.clippingRotY = 0;
       this.clippingScale = 1.0;
+      card.removeAttribute('data-clipping-type');
 
       this.notifyChange();
     }, 450);
