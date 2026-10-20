@@ -1,9 +1,10 @@
 /* ==========================================================================
-   ESTUDIO DE ESCRITOR DE ÉPOCA Y MÁQUINA DE ESCRIBIR NEGRA — ITERACIÓN 8
-   Ambientación fotográfica (c. 1950), escritorio de roble, laca negra e iluminación cálida
+   ESTUDIO DE ESCRITOR DE ÉPOCA Y MÁQUINA DE ESCRIBIR MECÁNICA 3D REAL
+   Diseño fotorrealista de gran escala, chasis de fundición esmaltada,
+   bobinas de cinta, palanca de retorno y teclas circulares con cuello mecánico
    ========================================================================== */
 
-/* Contenedor general de la escena */
+/* Contenedor general de la escena de login */
 .scene-typewriter {
   position: absolute;
   inset: 0;
@@ -13,20 +14,17 @@
   align-items: center;
   z-index: 50;
   transition: opacity 0.7s cubic-bezier(0.2, 0.85, 0.35, 1), transform 0.7s cubic-bezier(0.2, 0.85, 0.35, 1);
-  padding: 8px 16px;
-  overflow: hidden; /* Elimina scrollbars y asegura encuadre perfecto */
+  padding: 10px 24px;
+  overflow: hidden;
 }
 
 .scene-typewriter.is-hidden {
   opacity: 0;
-  transform: translateY(-30px) scale(0.96);
+  transform: translateY(-35px) scale(0.96);
   pointer-events: none;
 }
 
-/* ==========================================================================
-   B1 y B2. FONDO FOTORREALISTA: ESTUDIO DE ESCRITOR DE ÉPOCA CON LUZ CÁLIDA
-   ========================================================================== */
-
+/* Fondo arquitectónico fotográfico con iluminación cálida */
 .study-room-backdrop {
   position: absolute;
   inset: 0;
@@ -38,322 +36,82 @@
   background-size: cover;
   background-position: center bottom;
   background-repeat: no-repeat;
+  filter: contrast(1.08) brightness(0.95);
 }
 
-/* Sustituidos por la fotografía auténtica del estudio */
 .study-boiserie-wall,
-.study-ambient-lamp-beam {
+.study-ambient-lamp-beam,
+.study-desk-plane {
   display: none !important;
 }
 
-/* Encabezado ambiental de bienvenida */
+/* Encabezado ambiental sobrio y elegante */
 .typewriter-narrative-header {
   position: relative;
   z-index: 10;
   text-align: center;
-  margin-bottom: 6px;
-  max-width: 680px;
+  margin-bottom: 8px;
+  max-width: 720px;
 }
 
 .typewriter-narrative-header h2 {
   font-family: var(--font-display);
-  font-size: 1.25rem;
+  font-size: 1.35rem;
   color: var(--gold-foil-light);
-  letter-spacing: 0.06em;
-  margin-bottom: 2px;
+  letter-spacing: 0.08em;
+  margin-bottom: 3px;
   font-weight: 500;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.95);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.98);
 }
 
 .typewriter-narrative-header p {
   font-family: var(--font-serif);
   font-style: italic;
-  font-size: 0.84rem;
+  font-size: 0.88rem;
   color: #dfcaa7;
-  line-height: 1.35;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+  line-height: 1.4;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.95);
 }
 
-/* Viewport con perspectiva tridimensional humana sobre la mesa */
+/* Viewport 3D con perspectiva física y escala dominante */
 .typewriter-viewport {
   position: relative;
-  perspective: 1100px;
-  perspective-origin: 50% 36%;
+  perspective: 1400px;
+  perspective-origin: 50% 32%;
   display: flex;
   justify-content: center;
   align-items: center;
   width: 100%;
-  max-height: calc(100vh - 130px);
+  max-height: calc(100vh - 120px);
   z-index: 10;
-  margin: 2px 0;
-}
-
-/* Plano del escritorio integrado en el fondo fotográfico */
-.study-desk-plane {
-  display: none !important;
-}
-
-.study-prop-group {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  pointer-events: auto;
-}
-
-.study-prop-group.left-props {
-  align-items: flex-start;
-  transform: translateY(22px);
-}
-
-.study-prop-group.right-props {
-  align-items: flex-end;
-  transform: translateY(28px);
-}
-
-/* Hojas de manuscrito amarillento con caligrafía tenue */
-.study-prop-manuscripts {
-  position: relative;
-  width: 145px;
-  height: 90px;
-  margin-bottom: -28px;
-  margin-left: 12px;
-  z-index: 1;
-}
-
-.manuscript-leaf {
-  position: absolute;
-  width: 135px;
-  height: 90px;
-  background-color: #f3ecda;
-  background-image: 
-    repeating-linear-gradient(
-      to bottom,
-      transparent 0px,
-      transparent 9px,
-      rgba(90, 70, 50, 0.22) 10px,
-      transparent 11px
-    ),
-    radial-gradient(ellipse at 40% 40%, #fff 0%, #f0e6ce 70%, #dfcfb2 100%);
-  border-radius: 2px;
-  box-shadow: 
-    2px 6px 14px rgba(0, 0, 0, 0.65),
-    inset 0 0 8px rgba(180, 150, 110, 0.3);
-  border: 1px solid rgba(180, 160, 130, 0.45);
-}
-
-.manuscript-leaf.leaf-under {
-  transform: rotate(-10deg) translate(-8px, 6px);
-}
-
-.manuscript-leaf.leaf-top {
-  transform: rotate(-3deg);
-}
-
-/* Pila de libros antiguos en horizontal y un volumen vertical */
-.study-prop-books {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  z-index: 3;
-}
-
-.vintage-book {
-  position: relative;
-  border-radius: 3px 5px 5px 3px;
-  display: flex;
-  align-items: center;
-  box-shadow: 
-    3px 6px 16px rgba(0, 0, 0, 0.8),
-    inset 1px 1px 2px rgba(255, 255, 255, 0.2),
-    inset -2px -2px 4px rgba(0, 0, 0, 0.6);
-  user-select: none;
-}
-
-.vintage-book.book-stack-1 {
-  width: 185px;
-  height: 32px;
-  background: 
-    repeating-linear-gradient(to right, transparent 0px, transparent 38px, rgba(0,0,0,0.5) 39px, rgba(201,158,88,0.3) 40px, transparent 42px),
-    linear-gradient(180deg, #44141a 0%, #290a0f 60%, #150406 100%);
-  transform: rotate(-2deg);
-  border-left: 3px solid #6b242c;
-  z-index: 1;
-}
-
-.vintage-book.book-stack-2 {
-  width: 175px;
-  height: 28px;
-  background: 
-    repeating-linear-gradient(to right, transparent 0px, transparent 32px, rgba(0,0,0,0.6) 33px, rgba(201,158,88,0.25) 34px, transparent 36px),
-    linear-gradient(180deg, #24352a 0%, #17241c 60%, #0d1610 100%);
-  transform: rotate(3deg) translate(4px, -3px);
-  border-left: 3px solid #3c5243;
-  z-index: 2;
-}
-
-.vintage-book.book-stack-3 {
-  width: 165px;
-  height: 26px;
-  background: 
-    repeating-linear-gradient(to right, transparent 0px, transparent 28px, rgba(0,0,0,0.5) 29px, rgba(201,158,88,0.2) 30px, transparent 32px),
-    linear-gradient(180deg, #4a3424 0%, #302014 60%, #1c1109 100%);
-  transform: rotate(-1deg) translate(8px, -5px);
-  border-left: 3px solid #6c4f39;
-  z-index: 3;
-}
-
-.vintage-book.book-upright {
-  position: absolute;
-  left: 172px;
-  bottom: 0;
-  width: 26px;
-  height: 105px;
-  background: linear-gradient(90deg, #301f16 0%, #4a3325 50%, #20130d 100%);
-  border-radius: 4px 2px 2px 4px;
-  transform: rotate(-12deg);
-  transform-origin: bottom left;
-  border-top: 2px solid #6e4e3a;
-  z-index: 4;
-  box-shadow: 6px 8px 18px rgba(0, 0, 0, 0.85);
-}
-
-.vintage-book.book-upright .book-spine-label {
-  writing-mode: vertical-rl;
-  transform: rotate(180deg);
-  font-size: 0.62rem;
-  letter-spacing: 0.15em;
-  padding: 10px 0;
-}
-
-.bookend-bronze {
-  position: absolute;
-  left: 204px;
-  bottom: 0;
-  width: 22px;
-  height: 52px;
-  background: linear-gradient(135deg, #a48143 0%, #6d5124 55%, #3e2d11 100%);
-  clip-path: polygon(0 100%, 100% 100%, 80% 0, 20% 0);
-  border-radius: 2px;
-  box-shadow: 4px 6px 12px rgba(0, 0, 0, 0.7);
-  z-index: 5;
-}
-
-.book-spine-label {
-  font-family: var(--font-display);
-  font-size: 0.65rem;
-  letter-spacing: 0.12em;
-  color: var(--gold-foil-light);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
-  padding: 0 16px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* Tintero de cristal ámbar/oscuro facetado */
-.study-prop-inkwell {
-  position: relative;
-  width: 58px;
-  height: 64px;
-  margin-bottom: 22px;
-  margin-right: 36px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.inkwell-cap {
-  width: 26px;
-  height: 10px;
-  background: linear-gradient(180deg, #d8b260 0%, #8e6c27 70%, #4a360f 100%);
-  border-radius: 5px 5px 1px 1px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
-  z-index: 3;
-}
-
-.inkwell-neck {
-  width: 22px;
-  height: 6px;
-  background: linear-gradient(180deg, #785a20 0%, #4a360f 100%);
-  border-radius: 1px;
-  z-index: 2;
-}
-
-.inkwell-body {
-  width: 54px;
-  height: 48px;
-  background: 
-    linear-gradient(135deg, rgba(255, 255, 255, 0.35) 0%, transparent 35%),
-    linear-gradient(180deg, #3d2311 0%, #1a0d06 60%, #0c0603 100%);
-  border-radius: 6px 6px 8px 8px;
-  border: 1px solid rgba(160, 110, 60, 0.3);
-  box-shadow: 
-    inset 0 0 12px rgba(0, 0, 0, 0.9),
-    inset 2px 2px 4px rgba(255, 220, 160, 0.25),
-    0 10px 22px rgba(0, 0, 0, 0.85),
-    0 0 16px rgba(120, 70, 30, 0.2);
-  z-index: 1;
-}
-
-/* Pluma estilográfica de ebonita con plumín dorado */
-.study-prop-pen {
-  position: relative;
-  width: 140px;
-  height: 14px;
-  display: flex;
-  align-items: center;
-  transform: rotate(-32deg);
-  transform-origin: left center;
-  filter: drop-shadow(4px 8px 8px rgba(0, 0, 0, 0.85));
-}
-
-.pen-nib {
-  width: 18px;
-  height: 10px;
-  background: linear-gradient(90deg, #ecd38c 0%, #c59f48 60%, #684f1a 100%);
-  clip-path: polygon(0% 50%, 45% 0%, 100% 15%, 100% 85%, 45% 100%);
-  border-radius: 1px;
-}
-
-.pen-collar {
-  width: 8px;
-  height: 9px;
-  background: linear-gradient(90deg, #ecd38c 0%, #9e7a2b 100%);
-  border-radius: 1px;
-}
-
-.pen-barrel {
-  width: 114px;
-  height: 12px;
-  background: 
-    linear-gradient(180deg, #2a2a2a 0%, #121212 50%, #050505 100%);
-  border-radius: 0 8px 8px 0;
-  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.35);
-  border-left: 2px solid #c59f48;
+  margin: 4px 0;
 }
 
 /* ==========================================================================
-   B3 y B4. CHASIS DE LA MÁQUINA DE ESCRIBIR EN ESMALTE NEGRO SATINADO
+   CHASIS MECÁNICO FOTORREALISTA DE GRAN ESCALA (740px - 780px de ancho)
+   Cuerpo de hierro fundido, esmalte negro brillante, biseles de cromo y remaches
    ========================================================================== */
 
 .typewriter-chassis {
   position: relative;
-  width: min(530px, 92vw);
+  width: min(760px, 94vw);
   background: 
-    radial-gradient(ellipse at 32% 18%, rgba(255, 255, 255, 0.08) 0%, transparent 55%),
-    linear-gradient(175deg, #1e1f22 0%, #121315 28%, #090a0b 68%, #040405 100%);
-  border-radius: 18px 18px 24px 24px;
-  padding: 12px 20px 16px 20px;
+    radial-gradient(ellipse at 42% 16%, rgba(255, 255, 255, 0.14) 0%, transparent 48%),
+    radial-gradient(ellipse at 80% 85%, rgba(255, 255, 255, 0.05) 0%, transparent 40%),
+    linear-gradient(172deg, #282a2e 0%, #17181b 22%, #0a0b0d 62%, #030304 100%);
+  border-radius: 24px 24px 32px 32px;
+  padding: 16px 36px 24px 36px;
   box-shadow: 
-    /* Oclusión ambiental y contacto físico con el roble del escritorio */
-    0 2px 4px rgba(0, 0, 0, 0.95),
-    0 10px 22px rgba(0, 0, 0, 0.85),
-    0 28px 55px rgba(0, 0, 0, 0.92),
-    inset 0 1.5px 2px rgba(255, 245, 230, 0.22),
-    inset 0 -5px 12px rgba(0, 0, 0, 0.95),
-    0 0 0 1px rgba(60, 62, 66, 0.45);
-  transform: rotateX(10deg) scale(0.9);
+    /* Oclusión ambiental y contacto tridimensional profundo sobre el roble */
+    0 4px 8px rgba(0, 0, 0, 0.95),
+    0 16px 36px rgba(0, 0, 0, 0.92),
+    0 45px 90px rgba(0, 0, 0, 0.96),
+    inset 0 2px 3px rgba(255, 250, 240, 0.32),
+    inset 0 -8px 20px rgba(0, 0, 0, 0.98),
+    inset 2px 0 3px rgba(255, 255, 255, 0.12),
+    inset -2px 0 3px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(75, 78, 85, 0.65);
+  transform: rotateX(12deg) scale(1.04);
   transform-origin: center center;
   transform-style: preserve-3d;
   display: flex;
@@ -363,100 +121,245 @@
   z-index: 10;
 }
 
-/* Barra superior con placa dorada y control de sonido */
+/* Alas laterales biseladas que otorgan volumen escultórico a la carcasa */
+.chassis-side-wing {
+  position: absolute;
+  top: 14%;
+  bottom: 8%;
+  width: 22px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.chassis-side-wing.wing-left {
+  left: -12px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.18) 0%, #151618 35%, #050607 100%);
+  border-radius: 14px 0 0 18px;
+  box-shadow: -4px 10px 24px rgba(0, 0, 0, 0.85);
+  transform: rotateY(-24deg);
+  transform-origin: right center;
+}
+
+.chassis-side-wing.wing-right {
+  right: -12px;
+  background: linear-gradient(270deg, rgba(255, 255, 255, 0.08) 0%, #18191c 35%, #050607 100%);
+  border-radius: 0 14px 18px 0;
+  box-shadow: 4px 10px 24px rgba(0, 0, 0, 0.85);
+  transform: rotateY(24deg);
+  transform-origin: left center;
+}
+
+/* Reborde frontal biselado de hierro fundido */
+.chassis-front-lip {
+  position: absolute;
+  bottom: -6px;
+  left: 6%;
+  right: 6%;
+  height: 10px;
+  background: linear-gradient(180deg, #1b1c1e 0%, #060607 100%);
+  border-radius: 0 0 16px 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.95);
+  pointer-events: none;
+}
+
+/* Barra superior: placa de latón patinado y conmutador de sonido */
 .typewriter-top-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  margin-bottom: 8px;
-  padding: 0 4px;
+  margin-bottom: 12px;
+  padding: 0 8px;
+  z-index: 15;
 }
 
 .typewriter-badge {
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  letter-spacing: 0.25em;
-  color: #dfcaa7;
-  background: linear-gradient(180deg, #3c2f21 0%, #20170f 100%);
-  padding: 4px 14px;
-  border-radius: 3px;
-  border: 1px solid #7d6547;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 5px rgba(0, 0, 0, 0.6);
+  font-family: var(--font-display);
+  font-size: 0.82rem;
+  letter-spacing: 0.22em;
+  color: #f3dfba;
+  background: 
+    linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 40%),
+    linear-gradient(180deg, #513e28 0%, #302213 55%, #181007 100%);
+  padding: 6px 20px;
+  border-radius: 4px;
+  border: 1.5px solid #a68452;
+  box-shadow: 
+    inset 0 1px 1px rgba(255, 240, 200, 0.4),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.8),
+    0 3px 8px rgba(0, 0, 0, 0.7);
   text-transform: uppercase;
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
 }
 
-/* Botón discreto de control de audio Web Audio API */
+.badge-brand {
+  font-weight: 600;
+  color: #f7ecd5;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
+}
+
+.badge-year {
+  font-size: 0.74rem;
+  color: #c9ab7b;
+  letter-spacing: 0.14em;
+}
+
+/* Botón de control de audio Web Audio API */
 .btn-sound-toggle {
-  background: rgba(0, 0, 0, 0.35);
-  border: 1px solid rgba(201, 158, 88, 0.35);
+  background: rgba(14, 15, 18, 0.7);
+  border: 1px solid rgba(201, 158, 88, 0.4);
   color: #dfcaa7;
   font-family: var(--font-sans);
-  font-size: 0.74rem;
-  padding: 3px 10px;
-  border-radius: 12px;
+  font-size: 0.78rem;
+  padding: 5px 14px;
+  border-radius: 14px;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
 }
 
 .btn-sound-toggle:hover {
-  background: rgba(201, 158, 88, 0.18);
+  background: rgba(201, 158, 88, 0.25);
   border-color: var(--gold-foil);
   color: #fff;
+  transform: translateY(-1px);
 }
 
 .btn-sound-toggle.is-muted {
-  opacity: 0.6;
-  border-color: #666;
-  color: #aaa;
+  opacity: 0.55;
+  border-color: #555;
+  color: #888;
 }
 
-/* Carro móvil (Carriage Assembly) */
+/* ==========================================================================
+   CARRO PORTA-PAPEL MECÁNICO Y PALANCA DE RETORNO ARTICULADA
+   ========================================================================== */
+
 .typewriter-carriage-assembly {
   position: relative;
   width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
   transform: translateX(var(--carriage-shift, 0px));
-  transition: transform 0.08s ease-out;
+  transition: transform 0.08s cubic-bezier(0.18, 0.9, 0.3, 1);
+  transform-style: preserve-3d;
 }
 
-/* Riel cromado del carro */
+/* Palanca física articulada de retorno de carro (Carriage Return Lever) */
+.carriage-return-lever {
+  position: absolute;
+  left: -22px;
+  top: 18px;
+  width: 78px;
+  height: 48px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  z-index: 25;
+  transform-origin: right bottom;
+  transform: rotate(-10deg);
+  transition: transform 0.18s cubic-bezier(0.2, 0.85, 0.35, 1);
+  padding: 0;
+}
+
+.carriage-return-lever:hover {
+  transform: rotate(-16deg) scale(1.02);
+}
+
+.carriage-return-lever:active,
+.carriage-return-lever.is-pulled {
+  transform: rotate(24deg) scale(0.98);
+}
+
+.lever-handle {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 28px;
+  height: 12px;
+  background: linear-gradient(180deg, #f5f5f5 0%, #b8b8b8 45%, #666 100%);
+  border-radius: 6px;
+  box-shadow: 
+    0 2px 6px rgba(0, 0, 0, 0.8),
+    inset 0 1px 1px rgba(255, 255, 255, 0.8);
+}
+
+.lever-arm {
+  position: absolute;
+  left: 18px;
+  top: 6px;
+  width: 48px;
+  height: 8px;
+  background: linear-gradient(180deg, #e0e0e0 0%, #999 50%, #444 100%);
+  border-radius: 4px;
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.65);
+  transform: rotate(32deg);
+  transform-origin: left center;
+}
+
+.lever-pivot {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 40%, #fff 0%, #888 60%, #222 100%);
+  border: 1px solid #111;
+}
+
+/* Riel de acero con cremallera dentada */
 .carriage-track-rail {
   position: absolute;
-  top: 14px;
-  width: 102%;
-  height: 8px;
-  background: linear-gradient(180deg, #cfcfcf 0%, #888888 50%, #444444 100%);
-  border-radius: 4px;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.75);
+  top: 22px;
+  width: 104%;
+  height: 10px;
+  background: linear-gradient(180deg, #dfdfdf 0%, #8c8c8c 45%, #3c3c3c 100%);
+  border-radius: 5px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.85);
   z-index: 2;
 }
 
-/* Hoja de papel marfil insertada en el rodillo con textura de época real */
+.rail-toothed-gear {
+  width: 100%;
+  height: 3px;
+  background: repeating-linear-gradient(
+    to right,
+    #222 0px,
+    #222 2px,
+    #bbb 2px,
+    #bbb 4px
+  );
+  opacity: 0.65;
+  margin-top: 6px;
+}
+
+/* Hoja de papel marfil con textura artesanal e interlineado auténtico */
 .typewriter-paper-sheet {
-  width: 82%;
-  min-height: 135px;
-  background-color: #f5eedc;
+  width: 84%;
+  min-height: 155px;
+  background-color: #f7f1e1;
   background-image: 
-    linear-gradient(180deg, rgba(0, 0, 0, 0.08) 0%, transparent 12%, transparent 88%, rgba(0, 0, 0, 0.12) 100%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.08) 0%, transparent 12%, transparent 88%, rgba(0, 0, 0, 0.14) 100%),
     url('../assets/textures/moda-folded-rag-paper.webp');
   background-size: cover;
   background-position: center;
-  border-radius: 3px 3px 0 0;
-  padding: 14px 20px 12px 20px;
+  border-radius: 4px 4px 0 0;
+  padding: 16px 26px 14px 26px;
   box-shadow: 
-    0 -6px 20px rgba(0, 0, 0, 0.55),
-    inset 0 0 12px rgba(160, 130, 90, 0.22);
-  margin-bottom: -8px;
+    0 -8px 26px rgba(0, 0, 0, 0.6),
+    inset 0 0 16px rgba(160, 130, 90, 0.22);
+  margin-bottom: -10px;
   position: relative;
   z-index: 5;
-  border: 1px solid rgba(180, 160, 130, 0.5);
+  border: 1px solid rgba(170, 150, 120, 0.55);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -465,36 +368,36 @@
 
 .paper-watermark-text {
   font-family: var(--font-mono);
-  font-size: 0.68rem;
-  letter-spacing: 0.12em;
-  color: #8c7b68;
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  color: #7d6c57;
   text-transform: uppercase;
-  border-bottom: 1px dashed rgba(140, 123, 104, 0.35);
-  padding-bottom: 4px;
-  margin-bottom: 10px;
+  border-bottom: 1px dashed rgba(130, 110, 90, 0.4);
+  padding-bottom: 5px;
+  margin-bottom: 12px;
 }
 
 .paper-typed-output {
-  min-height: 48px;
+  min-height: 54px;
   font-family: "Courier New", Courier, monospace;
-  font-size: 1.6rem;
-  letter-spacing: 0.28em;
+  font-size: 1.85rem;
+  letter-spacing: 0.32em;
   font-weight: bold;
   color: #1a1612;
   display: flex;
   align-items: center;
   justify-content: center;
-  text-shadow: 0 0 1px rgba(0, 0, 0, 0.65);
+  text-shadow: 0 0 1px rgba(0, 0, 0, 0.7);
   word-break: break-all;
 }
 
 .typewriter-cursor {
   display: inline-block;
-  width: 2px;
-  height: 1.45rem;
+  width: 2.5px;
+  height: 1.7rem;
   background-color: #8e2a22; /* Tinta roja de cinta bicolor */
   margin-left: 2px;
-  animation: blinkCursor 0.9s infinite step-start;
+  animation: blinkCursor 0.85s infinite step-start;
 }
 
 @keyframes blinkCursor {
@@ -504,32 +407,32 @@
 
 .paper-hint-footer {
   font-family: var(--font-mono);
-  font-size: 0.68rem;
-  color: #8a7c6c;
+  font-size: 0.72rem;
+  color: #7d6f5f;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 6px;
+  margin-top: 8px;
+}
+
+.hint-label {
+  letter-spacing: 0.05em;
 }
 
 .hint-target-pill {
-  background: rgba(126, 40, 34, 0.08);
-  border: 1px solid rgba(126, 40, 34, 0.25);
+  background: rgba(142, 42, 34, 0.1);
+  border: 1px solid rgba(142, 42, 34, 0.35);
   color: #8e2a22;
-  padding: 2px 8px;
-  border-radius: 3px;
+  padding: 3px 12px;
+  border-radius: 4px;
   font-weight: bold;
+  letter-spacing: 0.12em;
 }
 
-/* Rodillo de goma negra (Platen) con perillas laterales torneadas */
+/* Rodillo cilíndrico de goma vulcanizada (Platen) */
 .typewriter-platen-roller {
-  width: 95%;
-  height: 24px;
-  background: linear-gradient(180deg, #444 0%, #1a1a1a 45%, #050505 100%);
-  border-radius: 12px;
-  box-shadow: 
-    inset 0 2px 4px rgba(255, 255, 255, 0.2), 
-    0 5px 12px rgba(0, 0, 0, 0.85);
+  width: 98%;
+  height: 28px;
   position: relative;
   z-index: 10;
   display: flex;
@@ -537,75 +440,171 @@
   justify-content: center;
 }
 
-/* Regleta de escala del rodillo */
-.platen-scale-bar {
-  width: 78%;
-  height: 3px;
-  background: repeating-linear-gradient(
-    to right,
-    rgba(255, 255, 255, 0.4) 0px,
-    rgba(255, 255, 255, 0.4) 1px,
-    transparent 1px,
-    transparent 6px
-  );
-  opacity: 0.45;
+.platen-cylinder {
+  position: absolute;
+  inset: 0 14px;
+  background: 
+    linear-gradient(180deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.02) 20%, transparent 40%, rgba(0, 0, 0, 0.9) 100%),
+    linear-gradient(180deg, #3c3c3c 0%, #171717 48%, #050505 100%);
+  border-radius: 14px;
+  box-shadow: 
+    inset 0 2px 4px rgba(255, 255, 255, 0.25), 
+    0 6px 16px rgba(0, 0, 0, 0.9);
 }
 
-/* Perillas plateadas con estriado mecánico moleteado */
+.platen-scale-bar {
+  position: relative;
+  z-index: 2;
+  width: 82%;
+  height: 4px;
+  background: repeating-linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0.45) 0px,
+    rgba(255, 255, 255, 0.45) 1px,
+    transparent 1px,
+    transparent 8px
+  );
+  opacity: 0.5;
+}
+
+/* Perillas plateadas torneadas con moleteado profundo */
 .platen-knob {
   position: absolute;
-  top: -6px;
-  width: 18px;
-  height: 36px;
+  top: -8px;
+  width: 22px;
+  height: 44px;
   background: 
-    repeating-linear-gradient(to bottom, #d0d0d0 0px, #d0d0d0 2px, #444 2px, #444 4px);
-  border-radius: 4px;
-  border: 1px solid #222;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.8);
+    repeating-linear-gradient(to bottom, #dedede 0px, #dedede 2px, #3a3a3a 2px, #3a3a3a 4px);
+  border-radius: 5px;
+  border: 1px solid #1a1a1a;
+  box-shadow: 
+    0 5px 12px rgba(0, 0, 0, 0.88),
+    inset 0 1px 2px rgba(255, 255, 255, 0.6);
+  z-index: 12;
 }
 
 .platen-knob.knob-left { left: -16px; }
 .platen-knob.knob-right { right: -16px; }
 
-/* Cesta semicircular de tipos mecánicos y guía de horquilla */
+/* ==========================================================================
+   BOBINAS DE CINTA BICOLOR Y CESTA RADIAL DE TIPOS MECÁNICOS
+   ========================================================================== */
+
+.typebar-segment-housing {
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+/* Bobinas de cinta laterales (Ribbon Spools) con tapas metálicas */
+.ribbon-spool-assembly {
+  position: absolute;
+  top: -6px;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: 
+    radial-gradient(circle at 35% 35%, #4a4d52 0%, #202225 55%, #08090a 100%);
+  border: 1.5px solid #6b727a;
+  box-shadow: 
+    0 6px 14px rgba(0, 0, 0, 0.85),
+    inset 0 1px 2px rgba(255, 255, 255, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 8;
+}
+
+.ribbon-spool-assembly.spool-left { left: 45px; }
+.ribbon-spool-assembly.spool-right { right: 45px; }
+
+.ribbon-spool-disc {
+  position: absolute;
+  inset: 7px;
+  border-radius: 50%;
+  border: 1.5px dashed rgba(200, 200, 200, 0.35);
+}
+
+.ribbon-spool-core {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 40%, #e0e0e0 0%, #777 60%, #1a1a1a 100%);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+}
+
+/* Cesta radial cóncava de tipos mecánicos */
 .typebar-basket {
   position: relative;
-  width: 160px;
-  height: 26px;
+  width: 220px;
+  height: 38px;
   background: 
-    radial-gradient(ellipse at 50% 100%, #0a0b0c 0%, #17181a 75%, #222427 100%);
-  border-radius: 0 0 20px 20px;
-  border-bottom: 2px solid #3d4045;
-  margin-bottom: 16px;
-  box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.95);
+    radial-gradient(ellipse at 50% 100%, #070809 0%, #151618 70%, #24262a 100%);
+  border-radius: 0 0 32px 32px;
+  border-bottom: 2.5px solid #45484f;
+  border-left: 1px solid #2b2d33;
+  border-right: 1px solid #2b2d33;
+  box-shadow: 
+    inset 0 4px 12px rgba(0, 0, 0, 0.98),
+    0 4px 10px rgba(0, 0, 0, 0.7);
   display: flex;
   justify-content: center;
   align-items: flex-end;
   overflow: visible;
+  z-index: 10;
+}
+
+/* Patrón de ranuras radiales mecanizadas en el segmento de tipos */
+.segment-slots-pattern {
+  position: absolute;
+  inset: 4px 12px 6px 12px;
+  background: repeating-linear-gradient(
+    to right,
+    rgba(0, 0, 0, 0.8) 0px,
+    rgba(0, 0, 0, 0.8) 2px,
+    rgba(255, 255, 255, 0.12) 2px,
+    rgba(255, 255, 255, 0.12) 3px,
+    transparent 3px,
+    transparent 7px
+  );
+  opacity: 0.75;
 }
 
 /* Horquilla cromada de guía de cinta */
 .ribbon-guide-fork {
   position: absolute;
-  top: -8px;
-  width: 18px;
-  height: 12px;
-  border: 2px solid #aaa;
+  top: -12px;
+  width: 22px;
+  height: 16px;
+  border: 2px solid #ccc;
   border-top: none;
-  border-radius: 0 0 3px 3px;
+  border-radius: 0 0 4px 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* Martillo / Palanca de impacto animada (Typebar Striker) */
+.ribbon-vibrator-ribbon {
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(180deg, #111 0%, #111 50%, #900 50%, #900 100%);
+}
+
+/* Martillo animado (Typebar Striker) */
 .typebar-striker {
   position: absolute;
-  bottom: 4px;
-  width: 4px;
-  height: 22px;
-  background: linear-gradient(180deg, #eee 0%, #888 60%, #333 100%);
+  bottom: 6px;
+  width: 5px;
+  height: 32px;
+  background: linear-gradient(180deg, #ffffff 0%, #a8a8a8 55%, #3a3a3a 100%);
   border-radius: 2px;
-  box-shadow: 0 0 3px rgba(0, 0, 0, 0.9);
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.95);
   transform-origin: bottom center;
-  transform: scaleY(0.25) translateY(12px);
+  transform: scaleY(0.2) translateY(18px);
   opacity: 0;
   transition: transform 0.05s ease, opacity 0.05s ease;
   pointer-events: none;
@@ -616,152 +615,163 @@
   content: "";
   position: absolute;
   top: 0;
-  left: -2px;
-  width: 8px;
-  height: 5px;
+  left: -3px;
+  width: 11px;
+  height: 7px;
   background: #111;
-  border: 1px solid #777;
+  border: 1px solid #888;
   border-radius: 1px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
 }
 
 .typebar-striker.is-striking {
-  transform: scaleY(1.1) translateY(-14px);
+  transform: scaleY(1.15) translateY(-22px);
   opacity: 1;
-  transition: transform 0.05s ease-out, opacity 0.03s ease-out;
+  transition: transform 0.04s cubic-bezier(0.1, 0.9, 0.2, 1), opacity 0.03s ease-out;
 }
 
 /* ==========================================================================
-   TECLADO ESCALONADO 3D CON TECLAS CIRCULARES NEGRAS Y ARO CROMADO DE ÉPOCA
+   TECLADO ESCALONADO 3D CON TECLAS CIRCULARES DE VIDRIO Y ARO CROMADO
+   Recorrido mecánico individual: cada tecla baja con resistencia y regresa
    ========================================================================== */
 
 .typewriter-keyboard {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
   width: 100%;
   align-items: center;
   user-select: none;
   transform-style: preserve-3d;
+  padding: 6px 12px 10px 12px;
 }
 
 .keyboard-row {
   display: flex;
-  gap: 7px;
+  gap: 10px;
   justify-content: center;
   transform-style: preserve-3d;
 }
 
-.keyboard-row.row-1 { transform: translateZ(6px); }
-.keyboard-row.row-2 { transform: translateZ(12px); }
-.keyboard-row.row-3 { transform: translateZ(18px); }
-.keyboard-row.row-4 { transform: translateZ(24px); }
+.keyboard-row.row-1 { transform: translateZ(8px); }
+.keyboard-row.row-2 { transform: translateZ(16px); }
+.keyboard-row.row-3 { transform: translateZ(24px); }
+.keyboard-row.row-4 { transform: translateZ(32px); }
 
-/* Tecla circular clásica: cuerpo cilíndrico, aro cromado y cara negra cóncava con letras marfil */
+/* Tecla circular clásica: cuerpo cilíndrico, aro metálico torneado y centro cóncavo */
 .type-key {
   position: relative;
-  width: 37px;
-  height: 37px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   background: 
-    radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0) 40%),
-    radial-gradient(circle at 45% 45%, #242629 0%, #131416 65%, #070809 100%);
-  border: 1.5px solid #8e969e;
+    radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0) 45%),
+    radial-gradient(circle at 45% 45%, #2a2c30 0%, #151619 65%, #08090a 100%);
+  border: 2px solid #9aa2ab;
   box-shadow: 
-    0 3px 0 #070809,
-    0 5px 8px rgba(0, 0, 0, 0.82),
-    inset 0 0 0 1px #090a0b,
-    inset 0 1px 1.5px rgba(255, 255, 255, 0.45);
-  color: #f0e6d2; /* Letras marfil envejecido */
+    0 4px 0 #070809,
+    0 8px 14px rgba(0, 0, 0, 0.88),
+    inset 0 0 0 1.5px #0a0b0d,
+    inset 0 1.5px 2px rgba(255, 255, 255, 0.55);
+  color: #f7edd8; /* Tipografía marfil envejecido */
   font-family: var(--font-serif);
-  font-size: 0.9rem;
+  font-size: 1.15rem;
   font-weight: bold;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: transform 0.06s ease, box-shadow 0.06s ease;
+  /* Animación física de descenso y retroceso mecánico controlado */
+  transition: transform 0.08s cubic-bezier(0.2, 0.85, 0.35, 1), box-shadow 0.08s ease;
   touch-action: manipulation;
 }
 
 .type-key:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 0 #070809, 0 6px 10px rgba(0, 0, 0, 0.88);
-  border-color: #bcc3cb;
+  transform: translateY(-1.5px);
+  box-shadow: 0 5.5px 0 #070809, 0 10px 18px rgba(0, 0, 0, 0.92);
+  border-color: #c9d2db;
 }
 
+/* Pulsación individual: la tecla desciende 4.5px con resistencia visual */
 .type-key:active,
 .type-key.is-pressed {
-  transform: translateY(3px);
+  transform: translateY(4.5px) !important;
   box-shadow: 
     0 0 0 #070809,
-    0 1.5px 3px rgba(0, 0, 0, 0.7),
-    inset 0 2px 4px rgba(0, 0, 0, 0.6);
+    0 2px 4px rgba(0, 0, 0, 0.8),
+    inset 0 3px 6px rgba(0, 0, 0, 0.75) !important;
+  border-color: #7b838c;
+  transition: transform 0.04s ease-out, box-shadow 0.04s ease-out !important;
 }
 
-/* Barra espaciadora rectangular elevada con volumen */
+/* Barra espaciadora rectangular maciza con textura y remates de metal */
 .type-key.key-space {
-  width: 190px;
-  height: 32px;
-  border-radius: 12px;
-  font-size: 0.72rem;
-  letter-spacing: 0.15em;
+  width: 250px;
+  height: 38px;
+  border-radius: 14px;
+  font-size: 0.82rem;
+  letter-spacing: 0.22em;
   font-family: var(--font-sans);
-  background: linear-gradient(180deg, #26282b 0%, #141517 60%, #08090a 100%);
-  border: 1.5px solid #7c8288;
-  color: #c4b7a2;
+  background: 
+    linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 35%),
+    linear-gradient(180deg, #2c2f33 0%, #16181a 60%, #090a0c 100%);
+  border: 2px solid #8d959e;
+  color: #d1c5b0;
   box-shadow: 
-    0 4px 0 #070809,
-    0 6px 10px rgba(0, 0, 0, 0.8),
-    inset 0 1px 1px rgba(255, 255, 255, 0.35);
+    0 5px 0 #070809,
+    0 9px 15px rgba(0, 0, 0, 0.85),
+    inset 0 1px 2px rgba(255, 255, 255, 0.45);
 }
 
 .type-key.key-space:active,
 .type-key.key-space.is-pressed {
-  transform: translateY(4px);
-  box-shadow: 0 0 0 #070809, 0 2px 4px rgba(0, 0, 0, 0.7);
+  transform: translateY(5px) !important;
+  box-shadow: 0 0 0 #070809, 0 2px 4px rgba(0, 0, 0, 0.8) !important;
 }
 
 /* Teclas de función (Borrar todo y Retroceso) */
 .type-key.key-action {
-  width: 58px;
-  border-radius: 16px;
-  font-size: 0.72rem;
+  width: 72px;
+  border-radius: 18px;
+  font-size: 0.82rem;
   font-family: var(--font-sans);
-  background: radial-gradient(circle at 38% 35%, #381f1e 0%, #1e100f 75%, #0e0706 100%);
-  color: #f7deda;
-  border-color: #8a5551;
-  box-shadow: 0 3px 0 #070404, 0 5px 8px rgba(0, 0, 0, 0.8);
+  background: 
+    radial-gradient(circle at 38% 35%, #422423 0%, #221211 75%, #0e0706 100%);
+  color: #fce2de;
+  border-color: #9c605b;
+  box-shadow: 0 4px 0 #090404, 0 7px 12px rgba(0, 0, 0, 0.85);
 }
 
-/* Botón accesible de omisión directa */
+/* Acceso alternativo y bypass accesible */
 .typewriter-access-actions {
   display: flex;
-  gap: 12px;
-  margin-top: 10px;
+  gap: 14px;
+  margin-top: 14px;
   align-items: center;
   z-index: 30;
 }
 
 .btn-bypass-narrative {
-  background: rgba(18, 12, 9, 0.85);
-  border: 1px solid rgba(201, 158, 88, 0.45);
+  background: rgba(18, 12, 9, 0.88);
+  border: 1px solid rgba(201, 158, 88, 0.5);
   color: #dfcaa7;
-  padding: 6px 18px;
-  border-radius: 20px;
+  padding: 8px 22px;
+  border-radius: 22px;
   font-family: var(--font-sans);
-  font-size: 0.82rem;
+  font-size: 0.88rem;
   cursor: pointer;
   transition: all 0.2s ease;
   text-decoration: none;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.75);
-  backdrop-filter: blur(6px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(8px);
 }
 
 .btn-bypass-narrative:hover {
-  background: rgba(201, 158, 88, 0.25);
+  background: rgba(201, 158, 88, 0.28);
   border-color: var(--gold-foil);
   color: #fff;
-  transform: translateY(-1px);
+  transform: translateY(-1.5px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.9);
 }
 
 .typewriter-hidden-input {
@@ -773,15 +783,57 @@
 }
 
 /* ==========================================================================
-   ADAPTACIÓN RESPONSIVE EN PANTALLAS MÓVILES (360 × 800)
+   RESPONSIVE Y PANTALLAS MÓVILES
    ========================================================================== */
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   .typewriter-chassis {
-    padding: 14px 12px 16px 12px;
-    transform: rotateX(6deg);
+    width: 96vw;
+    padding: 14px 16px 18px 16px;
+    transform: rotateX(8deg) scale(1.0);
   }
 
+  .typewriter-paper-sheet {
+    width: 90%;
+    min-height: 125px;
+    padding: 12px 16px;
+  }
+
+  .paper-typed-output {
+    font-size: 1.45rem;
+    letter-spacing: 0.22em;
+  }
+
+  .type-key {
+    width: 36px;
+    height: 36px;
+    font-size: 0.85rem;
+    box-shadow: 0 3px 0 #070809, 0 5px 8px rgba(0, 0, 0, 0.8);
+  }
+
+  .type-key.key-space {
+    width: 160px;
+    height: 32px;
+  }
+
+  .type-key.key-action {
+    width: 54px;
+    font-size: 0.72rem;
+  }
+
+  .keyboard-row {
+    gap: 6px;
+  }
+
+  .ribbon-spool-assembly {
+    width: 38px;
+    height: 38px;
+  }
+  .ribbon-spool-assembly.spool-left { left: 16px; }
+  .ribbon-spool-assembly.spool-right { right: 16px; }
+}
+
+@media (max-width: 480px) {
   .typewriter-narrative-header h2 {
     font-size: 1.15rem;
   }
@@ -790,67 +842,23 @@
     font-size: 0.76rem;
   }
 
-  .typewriter-paper-sheet {
-    width: 92%;
-    min-height: 115px;
-    padding: 10px 14px;
-  }
-
-  .paper-typed-output {
-    font-size: 1.25rem;
-    letter-spacing: 0.2em;
-  }
-
   .type-key {
-    width: 31px;
-    height: 31px;
-    font-size: 0.75rem;
-    border-width: 1.5px;
-    box-shadow: 0 3px 0 #1b1712, 0 4px 6px rgba(0, 0, 0, 0.7);
-  }
-
-  .type-key:active,
-  .type-key.is-pressed {
-    transform: translateY(3px);
+    width: 30px;
+    height: 30px;
+    font-size: 0.74rem;
   }
 
   .type-key.key-space {
-    width: 130px;
+    width: 120px;
   }
 
   .type-key.key-action {
-    width: 48px;
+    width: 44px;
     font-size: 0.65rem;
   }
 
   .keyboard-row {
     gap: 4px;
-  }
-
-  .platen-knob {
-    width: 14px;
-    height: 28px;
-  }
-}
-
-@media (max-width: 960px) {
-  .study-room-backdrop {
-    background-position: 28% bottom;
-  }
-
-  .study-desk-plane {
-    display: none; /* Centrar máquina de escribir limpia en pantallas estrechas */
-  }
-
-  .study-boiserie-wall {
-    height: 30vh;
-    padding: 8px 12px 0 12px;
-  }
-}
-
-@media (max-width: 600px) {
-  .study-room-backdrop {
-    background-position: 24% bottom;
   }
 }
 
@@ -859,6 +867,7 @@
   .typebar-striker,
   .type-key,
   .typewriter-carriage-assembly,
+  .carriage-return-lever,
   .typewriter-cursor {
     transition: none !important;
     animation: none !important;

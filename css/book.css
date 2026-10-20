@@ -72,6 +72,12 @@
   visibility: hidden !important;
 }
 
+.book-container.is-page-flipping .page-left {
+  transition: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
 /* ==========================================================================
    CANTOS FÍSICOS TRIDIMENSIONALES: CABEZA (SUPERIOR) Y PIE (INFERIOR)
    Estratificación volumétrica de cuadernillos con textura de papel y sombras

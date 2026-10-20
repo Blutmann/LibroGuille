@@ -114,6 +114,47 @@ class TypewriterAudio {
     } catch (_) {}
   }
 
+  playCarriageReturn() {
+    if (this.isMuted) return;
+    this.ensureContext();
+    if (!this.audioCtx) return;
+
+    try {
+      const t = this.audioCtx.currentTime;
+      const osc = this.audioCtx.createOscillator();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(420, t);
+      osc.frequency.exponentialRampToValueAtTime(160, t + 0.22);
+
+      const gain = this.audioCtx.createGain();
+      gain.gain.setValueAtTime(0.14, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.24);
+
+      osc.connect(gain);
+      gain.connect(this.audioCtx.destination);
+      osc.start(t);
+      osc.stop(t + 0.25);
+
+      setTimeout(() => {
+        if (!this.audioCtx) return;
+        const t2 = this.audioCtx.currentTime;
+        const thump = this.audioCtx.createOscillator();
+        thump.type = 'sine';
+        thump.frequency.setValueAtTime(140, t2);
+        thump.frequency.exponentialRampToValueAtTime(40, t2 + 0.06);
+
+        const thumpGain = this.audioCtx.createGain();
+        thumpGain.gain.setValueAtTime(0.22, t2);
+        thumpGain.gain.exponentialRampToValueAtTime(0.001, t2 + 0.07);
+
+        thump.connect(thumpGain);
+        thumpGain.connect(this.audioCtx.destination);
+        thump.start(t2);
+        thump.stop(t2 + 0.08);
+      }, 180);
+    } catch (_) {}
+  }
+
   playBackspace() {
     if (this.isMuted) return;
     this.ensureContext();
@@ -153,6 +194,7 @@ export class TypewriterController {
     this.btnSound = options.btnSound || document.getElementById('btnToggleSound');
     this.typebarStriker = options.typebarStriker || document.getElementById('typebarStriker');
     this.carriageAssembly = options.carriageAssembly || document.getElementById('carriageAssembly');
+    this.returnLever = options.returnLever || document.getElementById('carriageReturnLever');
     this.targetWord = (options.targetWord || 'HARISPE').toUpperCase();
     this.onUnlock = options.onUnlock || (() => {});
 
@@ -208,6 +250,14 @@ export class TypewriterController {
       this.btnClear.addEventListener('click', (e) => {
         e.preventDefault();
         this.clear();
+      });
+    }
+
+    // Palanca física de retorno de carro
+    if (this.returnLever) {
+      this.returnLever.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.pullReturnLever();
       });
     }
 
@@ -332,9 +382,27 @@ export class TypewriterController {
 
   advanceCarriage() {
     if (!this.carriageAssembly) return;
-    this.carriageStep = (this.carriageStep + 1) % 18;
-    const shift = (this.carriageStep * -1.8).toFixed(1);
+    this.carriageStep = this.typedText.length;
+    const maxSteps = 16;
+    const currentStep = Math.min(maxSteps, this.carriageStep);
+    const shift = (currentStep * -14.5).toFixed(1);
     this.carriageAssembly.style.setProperty('--carriage-shift', `${shift}px`);
+
+    if (this.carriageStep === this.targetWord.length - 1) {
+      this.audio.playBell();
+    }
+  }
+
+  pullReturnLever() {
+    if (!this.isActive || this.isUnlocked) return;
+    if (this.returnLever) {
+      this.returnLever.classList.add('is-pulled');
+      setTimeout(() => {
+        if (this.returnLever) this.returnLever.classList.remove('is-pulled');
+      }, 350);
+    }
+    this.audio.playCarriageReturn();
+    this.clear();
   }
 
   highlightKeyByChar(char) {
@@ -355,9 +423,11 @@ export class TypewriterController {
     if (this.typedText.length > 0) {
       this.audio.playBackspace();
       this.typedText = this.typedText.slice(0, -1);
-      if (this.carriageAssembly && this.carriageStep > 0) {
-        this.carriageStep--;
-        const shift = (this.carriageStep * -1.8).toFixed(1);
+      this.carriageStep = this.typedText.length;
+      if (this.carriageAssembly) {
+        const maxSteps = 16;
+        const currentStep = Math.min(maxSteps, this.carriageStep);
+        const shift = (currentStep * -14.5).toFixed(1);
         this.carriageAssembly.style.setProperty('--carriage-shift', `${shift}px`);
       }
       this.render();

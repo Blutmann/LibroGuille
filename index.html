@@ -87,47 +87,88 @@
 
         </div>
 
-        <!-- Chasis tridimensional de la máquina de escribir mecánica en esmalte negro profundo -->
+        <!-- Chasis tridimensional de la máquina de escribir mecánica en esmalte negro profundo y acero envejecido -->
         <div class="typewriter-chassis" id="typewriterChassis">
           
-          <!-- Barra superior con placa dorada y control de sonido Web Audio API -->
+          <!-- Carcasa volumétrica exterior (alas biseladas y base fundida) -->
+          <div class="chassis-side-wing wing-left" aria-hidden="true"></div>
+          <div class="chassis-side-wing wing-right" aria-hidden="true"></div>
+          <div class="chassis-front-lip" aria-hidden="true"></div>
+
+          <!-- Barra superior con placa dorada de bronce y control de sonido Web Audio API -->
           <div class="typewriter-top-bar">
-            <div class="typewriter-badge">Continental Standard · 1952</div>
+            <div class="typewriter-badge">
+              <span class="badge-brand">Continental Standard</span>
+              <span class="badge-year">· 1952 ·</span>
+            </div>
             <button type="button" id="btnToggleSound" class="btn-sound-toggle" aria-label="Activar o desactivar sonido mecánico" title="Sonido mecánico sintetizado">
               <span id="soundIcon">🔊</span> <span id="soundText">Sonido ON</span>
             </button>
           </div>
           
-          <!-- Carro porta-papel con riel mecánico y rodillo (Platen) -->
+          <!-- Carro porta-papel móvil con palanca de retorno (Carriage Return Lever), riel de acero y rodillo de caucho -->
           <div class="typewriter-carriage-assembly" id="carriageAssembly">
-            <div class="carriage-track-rail"></div>
+            
+            <!-- Palanca física articulada de retorno de carro -->
+            <button type="button" class="carriage-return-lever" id="carriageReturnLever" aria-label="Palanca de retorno de carro" title="Palanca de retorno de carro (Return)">
+              <span class="lever-handle"></span>
+              <span class="lever-arm"></span>
+              <span class="lever-pivot"></span>
+            </button>
 
-            <div class="typewriter-paper-sheet" id="typewriterPaperSheet" title="Hoja de papel en el rodillo (Tocá aquí para escribir)">
-              <div class="paper-watermark-text">República Argentina · Manuscrito Familiar</div>
+            <!-- Riel dentado y barra cromada con regla milimetrada -->
+            <div class="carriage-track-rail">
+              <div class="rail-toothed-gear"></div>
+            </div>
+
+            <!-- Hoja de papel insertada en el rodillo (Platen) -->
+            <div class="typewriter-paper-sheet" id="typewriterPaperSheet" title="Hoja de papel en el rodillo (Hacé clic para enfocar y tipear)">
+              <div class="paper-watermark-text">República Argentina · Archivo y Manuscrito Familiar</div>
               <div class="paper-typed-output" id="paperTypedOutput" aria-live="polite">
                 <span class="typewriter-cursor" aria-hidden="true"></span>
               </div>
               <div class="paper-hint-footer">
-                <span>Clave de acceso:</span>
+                <span class="hint-label">Apellido de acceso:</span>
                 <span class="hint-target-pill">HARISPE</span>
               </div>
             </div>
 
-            <!-- Rodillo de goma negra con perillas laterales moleteadas -->
+            <!-- Rodillo macizo de goma vulcanizada con perillas laterales torneadas -->
             <div class="typewriter-platen-roller">
-              <div class="platen-knob knob-left"></div>
+              <div class="platen-knob knob-left">
+                <div class="knob-grooves"></div>
+              </div>
+              <div class="platen-cylinder"></div>
               <div class="platen-scale-bar"></div>
-              <div class="platen-knob knob-right"></div>
+              <div class="platen-knob knob-right">
+                <div class="knob-grooves"></div>
+              </div>
             </div>
           </div>
 
-          <!-- Cesta de tipos mecánicos y martillo animado (Typebar Striker) -->
-          <div class="typebar-basket">
-            <div class="typebar-striker" id="typebarStriker"></div>
-            <div class="ribbon-guide-fork"></div>
+          <!-- Conjunto de bobinas de cinta de tinta bicolor (Ribbon Spools) y cesta cóncava de tipos -->
+          <div class="typebar-segment-housing">
+            <div class="ribbon-spool-assembly spool-left" aria-hidden="true">
+              <div class="ribbon-spool-disc"></div>
+              <div class="ribbon-spool-core"></div>
+            </div>
+            
+            <div class="typebar-basket">
+              <!-- Radial segment slots representing mechanical typebars -->
+              <div class="segment-slots-pattern" aria-hidden="true"></div>
+              <div class="typebar-striker" id="typebarStriker"></div>
+              <div class="ribbon-guide-fork">
+                <div class="ribbon-vibrator-ribbon"></div>
+              </div>
+            </div>
+
+            <div class="ribbon-spool-assembly spool-right" aria-hidden="true">
+              <div class="ribbon-spool-disc"></div>
+              <div class="ribbon-spool-core"></div>
+            </div>
           </div>
 
-          <!-- Teclado escalonado vintage 3D -->
+          <!-- Teclado mecánico escalonado tridimensional con cuellos metálicos individuales -->
           <div class="typewriter-keyboard" role="group" aria-label="Teclado mecánico de la máquina">
             <!-- Fila 1 -->
             <div class="keyboard-row row-1">
