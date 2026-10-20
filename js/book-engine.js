@@ -1484,7 +1484,10 @@ export class BookEngine {
             </div>
             <!-- Bloque derecho: 26.7.61, Diario El Argentino, Crítica de Ana Etchegoyen -->
             <div class="scrapbook-col scrapbook-item item-trinchera col-trinchera">
-              <img src="assets/sheet-02/header-el-argentino-1961.png" alt="el argentino 26.7.61 (encabezado periodístico y fecha)" class="header-el-argentino-1961" loading="eager">
+              <div class="heading-group-trinchera">
+                <img src="assets/sheet-02/header-el-argentino-1961.png" alt="el argentino (encabezado mecanografiado)" class="header-el-argentino-1961" loading="eager">
+                <img src="assets/sheet-02/date-1961-07-26.png" alt="26.7.61 (fecha mecanografiada)" class="date-typewritten-1961-right" loading="eager">
+              </div>
               <div class="clipping-card-wrap wrap-trinchera" tabindex="0" role="button" data-clipping="true" data-hires="assets/sheet-02/clipping-trinchera-1961-hires.png" aria-label="Examinar recorte de Trinchera del asombro por Ana Etchegoyen (1961) en primer plano" title="Hacé clic para examinar este recorte en primer plano">
                 <img src="assets/sheet-02/clipping-trinchera-1961.png" data-hires="assets/sheet-02/clipping-trinchera-1961-hires.png" alt="Recorte periodístico original: Trinchera del asombro de Guillermo B. Harispe por Ana Etchegoyen, El Argentino (26 de julio de 1961)" class="clipping-card-trinchera" loading="eager">
               </div>

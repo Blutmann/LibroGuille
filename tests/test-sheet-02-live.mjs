@@ -71,10 +71,16 @@ try {
 
   // Transición a la escena del libro
   await evalInPage(`
+    const bypass = document.getElementById('btnBypassTypewriter');
+    if (bypass) bypass.click();
     const ts = document.getElementById('sceneTypewriter');
     const bs = document.getElementById('sceneBook');
-    if (ts && bs) {
+    if (ts) {
       ts.classList.add('is-hidden');
+      ts.style.display = 'none';
+      ts.style.zIndex = '-9999';
+    }
+    if (bs) {
       bs.classList.remove('is-hidden');
     }
   `);

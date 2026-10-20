@@ -1054,12 +1054,31 @@
   z-index: 10;
 }
 
-.header-el-argentino-1961 {
-  width: 92%;
-  max-width: 156px;
-  height: auto;
+.heading-group-trinchera {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  width: 96%;
+  max-width: 172px;
   margin-bottom: 6px;
   margin-left: 2px;
+  user-select: none;
+  pointer-events: none;
+}
+
+.header-el-argentino-1961 {
+  width: 100%;
+  height: auto;
+  mix-blend-mode: multiply;
+  transform: rotate(0.2deg);
+  user-select: none;
+  pointer-events: none;
+}
+
+.date-typewritten-1961-right {
+  width: 55%;
+  height: auto;
+  margin-top: 2px;
   mix-blend-mode: multiply;
   transform: rotate(0.2deg);
   user-select: none;
@@ -1503,7 +1522,7 @@
   .date-typewritten-1961-left {
     margin-bottom: 4px;
   }
-  .header-el-argentino-1961 {
+  .heading-group-trinchera {
     margin-bottom: 4px;
   }
 
